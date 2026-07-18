@@ -215,4 +215,3 @@ function startMinecraftBot(userId, token) {
     activeBots[userId] = bot;
 }
 
-
