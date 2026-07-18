@@ -1,0 +1,15 @@
+{
+  "name": "mc-afk-host",
+  "version": "1.0.0",
+  "description": "Minecraft AFK Bot Hosting",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "express": "^4.18.2",
+    "mineflayer": "^4.20.0"
+  }
+}
+
