@@ -9,19 +9,13 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// تخزين البوتات والجلسات المشفرة للمتصفح
 let userSessions = {}; 
 let activeBots = {}; 
 
 const CLIENT_ID = "1528091848042873113"; 
-
-// جلب التوكن بشكل سري ومحمي من إعدادات الاستضافة مباشرة لمنع اختراقه أو حظره
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN; 
-
-// رابط الاستضافة (سيتم تحديثه تلقائياً بمجرد تشغيله على موقع Render)
 let RENDER_URL = "http://localhost:" + PORT;
 
-// --- الصفحة الرئيسية العامة للمنصة ---
 app.get('/', (req, res) => {
     res.send(`
     <body style="background:#0b0f19; color:white; font-family:sans-serif; text-align:center; padding-top:100px;" dir="rtl">
@@ -33,7 +27,6 @@ app.get('/', (req, res) => {
     `);
 });
 
-// --- لوحة التحكم الخاصة والمشفرة لكل مستخدم ---
 app.get('/dashboard/:token', (req, res) => {
     const token = req.params.token;
     const session = userSessions[token];
@@ -79,7 +72,6 @@ app.get('/dashboard/:token', (req, res) => {
                 <h2>👑 لوحة تحكم البوت: <span style="color:#38bdf8;">${session.botName}</span></h2>
                 <span class="status ${isBotRunning ? 'online' : 'offline'}">${isBotRunning ? 'شغال داخل اللعبة 🟢' : 'منفصل حالياً 🔴'}</span>
             </div>
-
             <div class="grid">
                 <div class="card">
                     <h3>🚀 تشغيل/إعادة تشغيل البوت</h3>
@@ -87,17 +79,15 @@ app.get('/dashboard/:token', (req, res) => {
                         <input type="text" name="ip" placeholder="IP السيرفر" value="${session.ip || ''}" required>
                         <input type="number" name="port" placeholder="المنفذ (Port)" value="${session.port || 25565}">
                         <input type="text" name="name" placeholder="اسم البوت في اللعبة" value="${session.botName}">
-                        <button type="submit">إطلق البوت لـ ماين كرافت ⚡</button>
+                        <button type="submit">إطلاق البوت لـ ماين كرافت ⚡</button>
                     </form>
                 </div>
-                
                 <div class="card">
                     <h3>🛑 إيقاف البوت وفصله</h3>
                     <p style="font-size:13px; color:#94a3b8;">سيتم سحب اللاعب فوراً من سيرفر الماين كرافت وحفظ موارد الاستضافة.</p>
                     <a href="/api/stop/${token}"><button class="btn-danger">إخراج البوت فوراً ❌</button></a>
                 </div>
             </div>
-
             <div class="card" style="margin-top:20px;">
                 <h3>🕹️ حركات حية خارقة (تفاعل فوري)</h3>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
@@ -106,7 +96,6 @@ app.get('/dashboard/:token', (req, res) => {
                     <a href="/api/action/${token}/sneak"><button class="btn-action">🧎 تسلل (Shift)</button></a>
                 </div>
             </div>
-
             <div class="card" style="margin-top:20px;">
                 <h3>💬 شات سيرفر الماين كرافت الحي</h3>
                 <div class="chat-box" id="chatBox">
@@ -117,7 +106,6 @@ app.get('/dashboard/:token', (req, res) => {
                     <button type="submit" style="width:120px; margin:0;">إرسال للشات 📣</button>
                 </form>
             </div>
-            
             <p style="text-align:center; font-size:12px; color:#475569; margin-top:20px;">استضافة ZX Royal المشفرة والمحمية بالكامل © 2026</p>
         </div>
         <script>
@@ -129,7 +117,6 @@ app.get('/dashboard/:token', (req, res) => {
     `);
 });
 
-// --- واجهات برمجية لعمليات الويب الخلفية (APIs) ---
 app.post('/api/start/:token', (req, res) => {
     const token = req.params.token;
     const session = userSessions[token];
@@ -163,7 +150,7 @@ app.post('/api/send-chat/:token', (req, res) => {
 
     if (bot && bot.spawned && req.body.msg) {
         bot.chat(req.body.msg);
-        session.logs.push(`<b style="color:#38bdf8;">[أنت]:</b> ${req.body.msg}`);
+        session.logs.push(`<b style="color:#38bdf8;">[أنت]:</b> \${req.body.msg}`);
     }
     res.redirect(`/dashboard/${token}`);
 });
@@ -188,7 +175,6 @@ app.get('/api/action/:token/:type', (req, res) => {
     res.redirect(`/dashboard/${token}`);
 });
 
-// --- نظام تشغيل لاعب الماين كرافت الآلي وحركاته ---
 function startMinecraftBot(userId, token) {
     const session = userSessions[token];
     if (!session) return;
@@ -217,3 +203,16 @@ function startMinecraftBot(userId, token) {
     });
 
     bot.on('message', (jsonMsg) => {
+        session.logs.push(jsonMsg.toAnsi ? jsonMsg.toAnsi() : jsonMsg.toString());
+        if (session.logs.length > 40) session.logs.shift();
+    });
+
+    bot.on('end', () => {
+        session.logs.push("<span style='color:#ef4444;'>🔴 انقطع الاتصال بالسيرفر! جاري إعادة الاتصال التلقائي...</span>");
+        setTimeout(() => { if (activeBots[userId]) startMinecraftBot(userId, token); }, 10000);
+    });
+
+    activeBots[userId] = bot;
+}
+
+
