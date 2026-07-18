@@ -1,5 +1,5 @@
 const express = require('express');
-const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, PermissionFlagsBehavior } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } = require('discord.js');
 const mineflayer = require('mineflayer');
 const crypto = require('crypto');
 
@@ -14,10 +14,11 @@ let userSessions = {};
 let activeBots = {}; 
 
 const CLIENT_ID = "1528091848042873113"; 
-// تذكير: يرجى عمل Reset للتوكن من صفحة المطورين للحفاظ على أمان سيرفرك وبوتك
-const DISCORD_TOKEN = "MTUyODA5MTg0ODA0Mjg3MzExMw.GgEa2k.qtQqz6dGdJ4bE21j2Wd71Mri7X-tTa1O4QMF1c"; 
 
-// رابط الاستضافة على Render (سيتم تحديثه تلقائياً بمجرد رفعه على موقع ريندر)
+// جلب التوكن بشكل سري ومحمي من إعدادات الاستضافة مباشرة لمنع اختراقه أو حظره
+const DISCORD_TOKEN = process.env.DISCORD_TOKEN; 
+
+// رابط الاستضافة (سيتم تحديثه تلقائياً بمجرد تشغيله على موقع Render)
 let RENDER_URL = "http://localhost:" + PORT;
 
 // --- الصفحة الرئيسية العامة للمنصة ---
@@ -25,14 +26,14 @@ app.get('/', (req, res) => {
     res.send(`
     <body style="background:#0b0f19; color:white; font-family:sans-serif; text-align:center; padding-top:100px;" dir="rtl">
         <h1 style="color:#38bdf8; font-size:35px;">👑 استضافة زد إكس رويال | ZX Royal</h1>
-        <p style="color:#94a3b8; font-size:18px;">المنصة تعمل بنجاح! توجه إلى سيرفر الديسكورد واضغط على الأزرار لفتح لوحة التحكم الخاصة بك.</p>
+        <p style="color:#94a3b8; font-size:18px;">المنصة السحابية تعمل بنجاح! توجه إلى سيرفر الديسكورد واضغط على الأزرار لفتح لوحة التحكم الخاصة بك.</p>
         <br>
         <a href="https://discord.com{CLIENT_ID}&permissions=8&integration_type=0&scope=bot" target="_blank" style="background:#5865F2; color:white; padding:12px 25px; border-radius:8px; text-decoration:none; font-weight:bold;">🔮 دعوة البوت وتفعيل الأزرار تلقائياً</a>
     </body>
     `);
 });
 
-// --- لوحة التحكم الخاصة والمشفرة لكل مستخدم (تفتح عبر الرابط) ---
+// --- لوحة التحكم الخاصة والمشفرة لكل مستخدم ---
 app.get('/dashboard/:token', (req, res) => {
     const token = req.params.token;
     const session = userSessions[token];
@@ -86,7 +87,7 @@ app.get('/dashboard/:token', (req, res) => {
                         <input type="text" name="ip" placeholder="IP السيرفر" value="${session.ip || ''}" required>
                         <input type="number" name="port" placeholder="المنفذ (Port)" value="${session.port || 25565}">
                         <input type="text" name="name" placeholder="اسم البوت في اللعبة" value="${session.botName}">
-                        <button type="submit">إطلاق البوت لـ ماين كرافت ⚡</button>
+                        <button type="submit">إطلق البوت لـ ماين كرافت ⚡</button>
                     </form>
                 </div>
                 
@@ -211,4 +212,8 @@ function startMinecraftBot(userId, token) {
             const dirs = ['forward', 'back', 'left', 'right'];
             const d = dirs[Math.floor(Math.random() * dirs.length)];
             bot.setControlState(d, true);
+            setTimeout(() => bot.setControlState(d, false), 400);
+        }, 5000);
+    });
 
+    bot.on('message', (jsonMsg) => {
