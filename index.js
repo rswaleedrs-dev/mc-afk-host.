@@ -150,7 +150,7 @@ app.post('/api/send-chat/:token', (req, res) => {
 
     if (bot && bot.spawned && req.body.msg) {
         bot.chat(req.body.msg);
-        session.logs.push(`<b style="color:#38bdf8;">[أنت]:</b> \${req.body.msg}`);
+        session.logs.push(`[أنت]: ` + req.body.msg);
     }
     res.redirect(`/dashboard/${token}`);
 });
@@ -203,15 +203,18 @@ function startMinecraftBot(userId, token) {
     });
 
     bot.on('message', (jsonMsg) => {
-        session.logs.push(jsonMsg.toAnsi ? jsonMsg.toAnsi() : jsonMsg.toString());
+        session.logs.push(jsonMsg.toString());
         if (session.logs.length > 40) session.logs.shift();
     });
 
     bot.on('end', () => {
-        session.logs.push("<span style='color:#ef4444;'>🔴 انقطع الاتصال بالسيرفر! جاري إعادة الاتصال التلقائي...</span>");
-        setTimeout(() => { if (activeBots[userId]) startMinecraftBot(userId, token); }, 10000);
+        session.logs.push("<span style='color:#ef4444;'>🔴 انقطع الاتصال بالسيرفر! جاري إعادة الاتصال...</span>");
     });
 
     activeBots[userId] = bot;
 }
+
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+
+client.on('ready', () => {
 
