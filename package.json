@@ -4,7 +4,7 @@
   "description": "Minecraft AFK Bot Hosting",
   "main": "index.js",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "discord.js": "^14.14.1",
