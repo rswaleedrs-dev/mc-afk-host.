@@ -14,126 +14,47 @@ let activeBots = {};
 
 const CLIENT_ID = "1528091848042873113";
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-let RENDER_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+let RENDER_URL = process.env.RENDER_EXTERNAL_URL || "http://localhost:" + PORT;
 
-// الصفحة الرئيسية للاستضافة
 app.get('/', (q, s) => {
-    s.send(`<body style="background:#020617;color:white;font-family:sans-serif;text-align:center;padding-top:100px;" dir="rtl">
-        <div style="max-width:600px;margin:auto;background:rgba(15,23,42,0.6);padding:40px;border-radius:24px;border:1px solid #8b5cf6;box-shadow:0 0 35px rgba(139,92,246,0.25)">
-            <h1 style="color:#a78bfa;font-size:42px;margin-bottom:10px;">🛡️ منظومة ZX Royal ULTIMATE V4</h1>
-            <p style="color:#94a3b8;font-size:20px;">الإصدار الأقوى والنهائي يعمل بأعلى درجات الاستقرار!</p><br>
-            <a href="https://discord.com{CLIENT_ID}&permissions=8&integration_type=0&scope=bot" target="_blank" style="background:linear-gradient(45deg,#7c3aed,#ec4899);color:white;padding:16px 36px;border-radius:14px;text-decoration:none;font-weight:bold;box-shadow:0 4px 20px rgba(236,72,153,0.4)">🔮 استدعاء الحماية القصوى</a>
-        </div>
-    </body>`);
+    s.send('<body style="background:#020617;color:white;font-family:sans-serif;text-align:center;padding-top:100px;" dir="rtl"><div style="max-width:600px;margin:auto;background:rgba(15,23,42,0.6);padding:40px;border-radius:24px;border:1px solid #8b5cf6;box-shadow:0 0 35px rgba(139,92,246,0.25)"><h1 style="color:#a78bfa;font-size:42px;margin-bottom:10px;">🛡️ منظومة ZX Royal ULTIMATE V4</h1><p style="color:#94a3b8;font-size:20px;">الإصدار الأقوى والنهائي يعمل بأعلى درجات الاستقرار!</p><br><a href="https://discord.com' + CLIENT_ID + '&permissions=8&integration_type=0&scope=bot" target="_blank" style="background:linear-gradient(45deg,#7c3aed,#ec4899);color:white;padding:16px 36px;border-radius:14px;text-decoration:none;font-weight:bold;box-shadow:0 4px 20px rgba(236,72,153,0.4)">🔮 استدعاء الحماية القصوى</a></div></body>');
 });
 
-// لوحة التحكم المستقلة والمطورة
 app.get('/dashboard/:token', (q, s) => {
     const t = q.params.token;
     let e = userSessions[t];
     let isGuest = false;
-    
     if (!e) {
         e = Object.values(userSessions).find(x => x.guestToken === t);
         if (e) isGuest = true;
     }
-    
     if (!e) return s.status(403).send("<h1>❌ رمز الوصول السري غير صالح!</h1>");
-    
     const b = activeBots[e.userId];
     const r = b && b.spawned;
     
-    s.send(`<!DOCTYPE html>
-    <html lang="ar" dir="rtl">
-    <head>
-        <meta charset="UTF-8">
-        <title>ZX ULTIMATE - ${e.userName}</title>
-        <meta name="viewport" content="width=device-width,initial-scale=1.0">
-        <style>
-            :root{--primary:#8b5cf6;--secondary:#ec4899;--bg:#020617;--card:rgba(15,23,42,0.75)}
-            body{font-family:sans-serif;background:var(--bg);color:#f1f5f9;padding:20px;margin:0;transition:all 0.3s}
-            .panel{max-width:850px;margin:auto;background:var(--card);padding:35px;border-radius:28px;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(16px);box-shadow:0 25px 50px rgba(0,0,0,0.6)}
-            .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:20px}
-            @media(max-width:768px){.grid{grid-template-columns:1fr}}
-            .card-stat{background:rgba(255,255,255,0.02);padding:15px;border-radius:16px;border:1px solid rgba(255,255,255,0.04);text-align:center}
-            input,button,select{width:100%;padding:14px;margin:8px 0;border-radius:14px;box-sizing:border-box;font-weight:bold;transition:all 0.2s}
-            input,select{background:rgba(0,0,0,0.4);color:#fff;border:1px solid rgba(255,255,255,0.08)}
-            input:focus,select:focus{border-color:var(--primary);outline:none}
-            button{background:linear-gradient(45deg,var(--primary),var(--secondary));color:#fff;border:none;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.25)}
-            button:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(139,92,246,0.4)}
-            .btn-action{background:#1e293b;border:1px solid rgba(255,255,255,0.05)}
-            .chat-box{background:rgba(0,0,0,0.5);height:180px;overflow-y:auto;padding:15px;border-radius:14px;border:1px solid rgba(255,255,255,0.05);font-family:monospace;font-size:14px;margin-bottom:10px}
-            .badge{background:linear-gradient(45deg,#ef4444,#dc2626);padding:4px 12px;border-radius:20px;font-size:12px}
-        </style>
-    </head>
-    <body>
-        <div class="panel">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-                <h2>🔮 المنظومة القصوى: <span style="color:#a78bfa">${e.botName}</span> [${r ? 'متصل متوازن 🟢' : 'منفصل 🔴'}] ${isGuest ? '<span class="badge">الضيوف 👤</span>' : ''}</h2>
-                <button onclick="toggleTheme()" style="width:auto;padding:8px 18px;font-size:12px;margin:0">🎨 تبديل النيون</button>
-            </div>
-            <div class="grid">
-                <div class="card-stat"><h5>🛡️ كود الأمان المولد</h5><h3 style="color:#ec4899;margin:5px 0;">${e.pinCode}</h3></div>
-                <div class="card-stat"><h5>⚔️ الهجمات المضادة</h5><h2>${e.stats.attacks}</h2></div>
-                <div class="card-stat"><h5>🦘 قفزات الإفلات</h5><h2>${e.stats.jumps}</h2></div>
-            </div>
-            ${isGuest ? '' : `
-            <form action="/api/start/${t}" method="POST">
-                <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <input type="text" name="ip" placeholder="IP سيرفر الماينكرافت" value="${e.ip || ''}" style="flex:2;min-width:180px;" required>
-                    <input type="number" name="port" value="${e.port || 25565}" style="flex:1;min-width:80px;">
-                    <input type="text" name="name" value="${e.botName}" placeholder="اسم البوت" style="flex:1;min-width:120px;">
-                </div>
-                <button type="submit">إطلاق اقتران النواة المستقر ⚡</button>
-            </form><br>
-            <a href="/api/stop/${t}"><button style="background:linear-gradient(45deg,#f43f5e,#e11d48);color:#fff">تعطيل وإخراج الحساب فوراً ❌</button></a>`}
-            
-            <div style="margin-top:20px">
-                <h3>🕹️ مصفوفة المناورة والتحكم اللحظي</h3>
-                <div style="display:flex;flex-wrap:wrap;gap:10px">
-                    <a href="/api/action/${t}/jump" style="flex:1;min-width:70px"><button class="btn-action">🦘 قفز نجاة</button></a>
-                    <a href="/api/action/${t}/swing" style="flex:1;min-width:70px"><button class="btn-action">⚔️ ضرب يدوي</button></a>
-                    <a href="/api/action/${t}/toggle-hunter" style="flex:2;min-width:150px"><button style="background:${e.hunterActive ? '#10b981' : '#f43f5e'}">${e.hunterActive ? '🎯 صيد الوحوش: مفعل' : '🎯 صيد الوحوش: معطل'}</button></a>
-                </div>
-            </div>
-            
-            <div style="margin-top:20px">
-                <h3>💬 إعدادات الرد التلقائي الذكي والدردشة</h3>
-                ${isGuest ? '' : `
-                <form action="/api/update-responder/${t}" method="POST" style="background:rgba(0,0,0,0.2);padding:15px;border-radius:14px;border:1px solid rgba(255,255,255,0.05);margin-bottom:15px;">
-                    <label style="font-size:13px;color:#94a3b8;">رسالة الرد الآلي عند مناداة البوت:</label>
-                    <input type="text" name="autoReply" value="${e.autoReplyMessage}" required>
-                    <button type="submit" style="background:#475569;margin-top:5px;padding:8px;">تحديث الرد الذكي 💾</button>
-                </form>`}
-                <div class="chat-box" id="cb">${e.logs.map(l => `<div>${l}</div>`).join('')}</div>
-                <form action="/api/send-chat/${t}" method="POST" style="display:flex;gap:10px">
-                    <input type="text" name="msg" placeholder="أرسل رسالة أو أمر ميني فلاير داخل اللعبة..." required>
-                    <button type="submit" style="width:100px">إرسال</button>
-                </form>
-            </div>
-            ${isGuest ? '' : `
-            <div style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.08);padding-top:15px;">
-                <h3>👤 بوابات تفويض الحلفاء والأصدقاء</h3>
-                <p style="color:#94a3b8;font-size:13px;">رابط مراقبة فرعي آمن ومحمي للأصدقاء ليتابعوا معك دون القدرة على تعديل الـ IP أو الاسم:</p>
-                <input type="text" readonly value="${RENDER_URL}/dashboard/${e.guestToken}" onclick="this.select();" style="cursor:pointer;background:rgba(255,255,255,0.02)">
-            </div>`}
-        </div>
-        <script>
-            const b=document.getElementById('cb');b.scrollTop=b.scrollHeight;
-            function toggleTheme(){
-                const r=document.documentElement.style;
-                if(r.getPropertyValue('--primary')==='#ec4899'){
-                    r.setProperty('--primary','#8b5cf6');r.setProperty('--secondary','#ec4899')
-                }else{
-                    r.setProperty('--primary','#ec4899');r.setProperty('--secondary','#06b6d4')
-                }
-            }
-        </script>
-    </body>
-    </html>`);
+    let html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>ZX ULTIMATE - ' + e.userName + '</title><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>:root{--primary:#8b5cf6;--secondary:#ec4899;--bg:#020617;--card:rgba(15,23,42,0.75)}body{font-family:sans-serif;background:var(--bg);color:#f1f5f9;padding:20px;margin:0;transition:all 0.3s}.panel{max-width:850px;margin:auto;background:var(--card);padding:35px;border-radius:28px;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(16px);box-shadow:0 25px 50px rgba(0,0,0,0.6)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:20px}@media(max-width:768px){.grid{grid-template-columns:1fr}}.card-stat{background:rgba(255,255,255,0.02);padding:15px;border-radius:16px;border:1px solid rgba(255,255,255,0.04);text-align:center}input,button,select{width:100%;padding:14px;margin:8px 0;border-radius:14px;box-sizing:border-box;font-weight:bold;transition:all 0.2s}input,select{background:rgba(0,0,0,0.4);color:#fff;border:1px solid rgba(255,255,255,0.08)}input:focus,select:focus{border-color:var(--primary);outline:none}button{background:linear-gradient(45deg,var(--primary),var(--secondary));color:#fff;border:none;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.25)}button:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(139,92,246,0.4)}.btn-action{background:#1e293b;border:1px solid rgba(255,255,255,0.05)}.chat-box{background:rgba(0,0,0,0.5);height:180px;overflow-y:auto;padding:15px;border-radius:14px;border:1px solid rgba(255,255,255,0.05);font-family:monospace;font-size:14px;margin-bottom:10px}.badge{background:linear-gradient(45deg,#ef4444,#dc2626);padding:4px 12px;border-radius:20px;font-size:12px}</style></head><body><div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;"><h2>🔮 المنظومة القصوى: <span style="color:#a78bfa">' + e.botName + '</span> [' + (r ? "متصل متوازن 🟢" : "منفصل 🔴") + '] ' + (isGuest ? '<span class="badge">الضيوف 👤</span>' : "") + '</h2><button onclick="toggleTheme()" style="width:auto;padding:8px 18px;font-size:12px;margin:0">🎨 تبديل النيون</button></div><div class="grid"><div class="card-stat"><h5>🛡️ كود الأمان المولد</h5><h3 style="color:#ec4899;margin:5px 0;">' + e.pinCode + '</h3></div><div class="card-stat"><h5>⚔️ الهجمات المضادة</h5><h2>' + e.stats.attacks + '</h2></div><div class="card-stat"><h5>🦘 قفزات الإفلات</h5><h2>' + e.stats.jumps + '</h2></div></div>';
+    
+    if (!isGuest) {
+        html += '<form action="/api/start/' + t + '" method="POST"><div style="display:flex;gap:10px;flex-wrap:wrap;"><input type="text" name="ip" placeholder="IP سيرفر الماينكرافت" value="' + (e.ip || "") + '" style="flex:2;min-width:180px;" required><input type="number" name="port" value="' + (e.port || 25565) + '" style="flex:1;min-width:80px;"><input type="text" name="name" value="' + e.botName + '" placeholder="اسم البوت" style="flex:1;min-width:120px;"></div><button type="submit">إطلاق اقتران النواة المستقر ⚡</button></form><br><a href="/api/stop/' + t + '"><button style="background:linear-gradient(45deg,#f43f5e,#e11d48);color:#fff">تعطيل وإخراج الحساب فوراً ❌</button></a>';
+    }
+    
+    html += '<div style="margin-top:20px"><h3>🕹️ مصفوفة المناورة والتحكم اللحظي</h3><div style="display:flex;flex-wrap:wrap;gap:10px"><a href="/api/action/' + t + '/jump" style="flex:1;min-width:70px"><button class="btn-action">🦘 قفز نجاة</button></a><a href="/api/action/' + t + '/swing" style="flex:1;min-width:70px"><button class="btn-action">⚔️ ضرب يدوي</button></a><a href="/api/action/' + t + '/toggle-hunter" style="flex:2;min-width:150px"><button style="background:' + (e.hunterActive ? '#10b981' : '#f43f5e') + '">' + (e.hunterActive ? '🎯 صيد الوحوش: مفعل' : '🎯 صيد الوحوش: معطل') + '</button></a></div></div><div style="margin-top:20px"><h3>💬 إعدادات الرد التلقائي الذكي والدردشة</h3>';
+    
+    if (!isGuest) {
+        html += '<form action="/api/update-responder/' + t + '" method="POST" style="background:rgba(0,0,0,0.2);padding:15px;border-radius:14px;border:1px solid rgba(255,255,255,0.05);margin-bottom:15px;"><label style="font-size:13px;color:#94a3b8;">رسالة الرد الآلي عند مناداة البوت:</label><input type="text" name="autoReply" value="' + e.autoReplyMessage + '" required><button type="submit" style="background:#475569;margin-top:5px;padding:8px;">تحديث الرد الذكي 💾</button></form>';
+    }
+    
+    html += '<div class="chat-box" id="cb">' + e.logs.map(l => '<div>' + l + '</div>').join('') + '</div><form action="/api/send-chat/' + t + '" method="POST" style="display:flex;gap:10px"><input type="text" name="msg" placeholder="أرسل رسالة أو أمر ميني فلاير داخل اللعبة..." required><button type="submit" style="width:100px">إرسال</button></form></div>';
+    
+    if (!isGuest) {
+        html += '<div style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.08);padding-top:15px;"><h3>👤 بوابات تفويض الحلفاء والأصدقاء</h3><p style="color:#94a3b8;font-size:13px;">رابط مراقبة فرعي آمن ومحمي للأصدقاء ليتابعوا معك دون القدرة على تعديل الـ IP أو الاسم:</p><input type="text" readonly value="' + RENDER_URL + '/dashboard/' + e.guestToken + '" onclick="this.select();" style="cursor:pointer;background:rgba(255,255,255,0.02)"></div>';
+    }
+    
+    html += '</div><script>const b=document.getElementById("cb");b.scrollTop=b.scrollHeight;function toggleTheme(){const r=document.documentElement.style;if(r.getPropertyValue("--primary")==="#ec4899"){r.setProperty("--primary","#8b5cf6");r.setProperty("--secondary","#ec4899")}else{r.setProperty("--primary","#ec4899");r.setProperty("--secondary","#06b6d4")}}</script></body></html>';
+    
+    s.send(html);
 });
 
-// بدء اتصال البوت
 app.post('/api/start/:token', (q, s) => {
     const t = q.params.token;
     const e = userSessions[t];
@@ -146,18 +67,16 @@ app.post('/api/start/:token', (q, s) => {
     setTimeout(() => s.redirect('/dashboard/' + t), 2000);
 });
 
-// تحديث نظام الرد الآلي
 app.post('/api/update-responder/:token', (q, s) => {
     const t = q.params.token;
     const e = userSessions[t];
     if (e && q.body.autoReply) {
         e.autoReplyMessage = q.body.autoReply;
-        e.logs.push(`🔹 تم تحديث نص الرد التلقائي بنجاح.`);
+        e.logs.push("🔹 تم تحديث نص الرد التلقائي بنجاح.");
     }
     s.redirect('/dashboard/' + t);
 });
 
-// إيقاف تشغيل البوت
 app.get('/api/stop/:token', (q, s) => {
     const t = q.params.token;
     const e = userSessions[t];
@@ -169,8 +88,40 @@ app.get('/api/stop/:token', (q, s) => {
     s.redirect('/dashboard/' + t);
 });
 
-// إرسال رسائل شات للعبة
 app.post('/api/send-chat/:token', (q, s) => {
     const t = q.params.token;
     let e = userSessions[t];
     if (!e) {
+        e = Object.values(userSessions).find(x => x.guestToken === t);
+    }
+    const b = activeBots[e?.userId];
+    if (b && b.spawned && q.body.msg) {
+        b.chat(q.body.msg);
+        e.logs.push('<span style="color:#f43f5e">[' + (q.params.token === e.guestToken ? "حليف" : "قائد") + ']:</span> ' + q.body.msg);
+    }
+    s.redirect('/dashboard/' + t);
+});
+
+app.get('/api/action/:token/:type', (q, s) => {
+    const t = q.params.token;
+    let e = userSessions[t];
+    if (!e) {
+        e = Object.values(userSessions).find(x => x.guestToken === t);
+    }
+    const b = activeBots[e?.userId];
+    const y = q.params.type;
+    if (e && y === 'toggle-hunter') {
+        e.hunterActive = !e.hunterActive;
+        e.logs.push("🎯 مصفوفة الصيد الهجومية " + (e.hunterActive ? "مستعدة للفتك ⚔️" : "في وضع السكون 💤"));
+    }
+    if (b && b.spawned) {
+        if (y === 'jump') {
+            b.setControlState('jump', true);
+            setTimeout(() => b.setControlState('jump', false), 1000);
+            e.stats.jumps++;
+        } else if (y === 'swing') {
+            b.swingHand('right');
+            e.stats.attacks++;
+        }
+    }
+
