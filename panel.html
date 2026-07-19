@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZX Royal Elite Dashboard</title>
+    <style>
+        :root { --primary: #00ffcc; --secondary: #0099ff; --dark-bg: #060913; --card-bg: #0d1527; --text: #f3f4f6; }
+        body { background: var(--dark-bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; text-align: center; padding: 20px; margin: 0; }
+        .box { max-width: 550px; margin: 25px auto; background: var(--card-bg); padding: 30px; border-radius: 24px; border: 1px solid rgba(0, 255, 204, 0.2); box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(0, 255, 204, 0.05); }
+        h3 { color: var(--primary); margin-top: 0; font-size: 24px; text-shadow: 0 0 15px rgba(0, 255, 204, 0.4); }
+        .status-badge { display: inline-block; padding: 6px 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 20px; color: #ef4444; font-size: 13px; font-weight: bold; margin-bottom: 20px; }
+        .input-group { margin-bottom: 18px; text-align: right; }
+        label { display: block; font-size: 13px; color: #9ca3af; margin-bottom: 6px; font-weight: 600; padding-right: 5px; }
+        input { width: 100%; padding: 12px 15px; background: #080d1a; border: 1px solid #1f2937; border-radius: 12px; color: #fff; font-size: 15px; transition: all 0.3s ease; box-sizing: border-box; }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 12px rgba(0, 255, 204, 0.2); }
+        .btn-main { width: 100%; padding: 14px; margin: 10px 0; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; transition: all 0.3s ease; }
+        .btn-blue { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #060913; box-shadow: 0 4px 15px rgba(0, 255, 204, 0.2); }
+        .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 255, 204, 0.4); }
+        .btn-red { background: #ef4444; color: #fff; }
+        .btn-red:hover { background: #dc2626; transform: translateY(-2px); }
+        .section-title { text-align: right; font-size: 14px; color: var(--secondary); margin: 25px 0 12px 0; border-bottom: 1px solid #1f2937; padding-bottom: 6px; font-weight: bold; letter-spacing: 0.5px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .btn-action { background: #111b33; color: #9ca3af; padding: 12px; font-size: 13px; font-weight: 600; border-radius: 10px; border: 1px solid #1f2937; cursor: pointer; transition: all 0.2s ease; }
+        .btn-action:hover { border-color: var(--primary); color: #fff; background: #162447; }
+        .chat-box { background: #080d1a; height: 140px; border-radius: 12px; border: 1px solid #1f2937; margin-top: 10px; text-align: right; padding: 15px; overflow-y: auto; font-size: 14px; box-sizing: border-box; }
+        .chat-input-row { display: flex; gap: 10px; margin-top: 12px; }
+        .chat-input { flex: 1; }
+        .btn-send { width: auto; padding: 0 25px; margin: 0; background: #1f2937; color: var(--primary); border: 1px solid var(--primary); border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .btn-send:hover { background: var(--primary); color: #060913; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h3>👑 منصة زد إكس رويال النخبوية</h3>
+        <div class="status-badge">🔴 حالة البوت الحالية: منفصل عن الهوست</div>
+        
+        <div class="input-group">
+            <label>عنوان خادم الماينكرافت (Server IP)</label>
+            <input type="text" placeholder="play.zxroyal.net">
+        </div>
+        <div class="input-group">
+            <label>منفذ الاتصال (Port)</label>
+            <input type="text" value="25565">
+        </div>
+        <div class="input-group">
+            <label>اسم الحساب المستعار</label>
+            <input type="text" value="ZX_mc1_7">
+        </div>
+
+        <button class="btn-main btn-blue" onclick="alert('⚡ جاري الاتصال وتجاوز الحماية... تم إطلاق البوت أونلاين!')">🚀 إطلاق البوت الفوري</button>
+        <button class="btn-main btn-red" onclick="alert('🛑 تم سحب وإخراج البوت بأمان من الخادم.')">🛑 إخراج البوت المباشر</button>
+
+        <div class="section-title">🏃 تحركات حية متطورة</div>
+        <div class="grid">
+            <button class="btn-action" onclick="alert('🦘 تم تفعيل القفز المستمر')">🦘 قفز ذكي</button>
+            <button class="btn-action" onclick="alert('⚔️ تم تفعيل الهجوم التلقائي لمنع الطرد')">⚔️ ضرب تلقائي</button>
+            <button class="btn-action" onclick="alert('🏃 تم تفعيل التسلل والمشي الدائري')">🏃 تسلل وحركة</button>
+        </div>
+
+        <div class="section-title">💬 الشات الحي الفوري</div>
+        <div class="chat-box">
+            <p style="color: var(--primary); margin:0;">• مرحباً بك في الإصدار الفاخر والمطور لوحة ZX Royal الحية!</p>
+        </div>
+        <div class="chat-input-row">
+            <input type="text" class="chat-input" placeholder="اكتب رسالة أو أمر داخلي...">
+            <button class="btn-send" onclick="alert('جاري إرسال الرسالة إلى شات اللعبة...')">إرسال</button>
+        </div>
+    </div>
+</body>
+          </html>
