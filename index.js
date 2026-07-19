@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// 🌐 قراءة ملف الويب الخارجي بشكل نظيف وآمن يمنع أخطاء الأكواد
+// 🌐 قراءة ملف الويب الخارجي بشكل نظيف وآمن
 app.get('/dashboard/:botname', (req, res) => {
     res.sendFile(path.join(__dirname, 'panel.html'));
 });
@@ -58,7 +58,13 @@ client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
     if (interaction.customId === 'zx_get_link') {
-        const renderUrl = `https://onrender.com`;
+        // 🔮 السحر هنا: البوت يكتشف اسم النطاق ورابط السيرفر في ريندر تلقائياً أياً كان اسمه!
+        const hostHeader = interaction.guild.client.options.http?.api || ''; 
+        // سنستخدم متغير البيئة الافتراضي الذي توفره ريندر تلقائياً أو نعتمد على تحديد الرابط بشكل مرن
+        const currentHost = process.env.RENDER_EXTERNAL_URL || `https://onrender.com`;
+        
+        const renderUrl = `${currentHost}/dashboard/ZX_mc1_7`;
+        
         await interaction.reply({ 
             content: `🎯 **تفضل رابط لوحة التحكم الويب الخنفسارية والمطورة بالكامل:**\n🔗 [اضغط هنا لفتح لوحة التحكم الفاخرة](${renderUrl})`, 
             ephemeral: true 
