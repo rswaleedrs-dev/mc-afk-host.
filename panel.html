@@ -3,27 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZX Royal Elite Dashboard</title>
+    <title>ZX Royal Elite Ultra Dashboard</title>
     <style>
-        :root { --primary: #00ffcc; --secondary: #0099ff; --dark-bg: #060913; --card-bg: #0d1527; --text: #f3f4f6; }
+        :root { --primary: #00ffcc; --secondary: #0099ff; --dark-bg: #060913; --card-bg: #0d1527; --text: #f3f4f6; --purple: #a855f7; }
         body { background: var(--dark-bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; text-align: center; padding: 20px; margin: 0; }
         .box { max-width: 550px; margin: 25px auto; background: var(--card-bg); padding: 30px; border-radius: 24px; border: 1px solid rgba(0, 255, 204, 0.2); box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(0, 255, 204, 0.05); }
-        h3 { color: var(--primary); margin-top: 0; font-size: 24px; text-shadow: 0 0 15px rgba(0, 255, 204, 0.4); }
+        h3 { color: var(--primary); margin-top: 0; font-size: 26px; text-shadow: 0 0 15px rgba(0, 255, 204, 0.4); margin-bottom: 5px; }
         .status-badge { display: inline-block; padding: 6px 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 20px; color: #ef4444; font-size: 13px; font-weight: bold; margin-bottom: 20px; }
         .input-group { margin-bottom: 18px; text-align: right; }
         label { display: block; font-size: 13px; color: #9ca3af; margin-bottom: 6px; font-weight: 600; padding-right: 5px; }
         input { width: 100%; padding: 12px 15px; background: #080d1a; border: 1px solid #1f2937; border-radius: 12px; color: #fff; font-size: 15px; transition: all 0.3s ease; box-sizing: border-box; }
         input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 12px rgba(0, 255, 204, 0.2); }
+        
+        /* الأزرار الرئيسية */
         .btn-main { width: 100%; padding: 14px; margin: 10px 0; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; transition: all 0.3s ease; }
         .btn-blue { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #060913; box-shadow: 0 4px 15px rgba(0, 255, 204, 0.2); }
         .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 255, 204, 0.4); }
         .btn-red { background: #ef4444; color: #fff; }
         .btn-red:hover { background: #dc2626; transform: translateY(-2px); }
-        .section-title { text-align: right; font-size: 14px; color: var(--secondary); margin: 25px 0 12px 0; border-bottom: 1px solid #1f2937; padding-bottom: 6px; font-weight: bold; letter-spacing: 0.5px; }
+        
+        .section-title { text-align: right; font-size: 14px; color: var(--secondary); margin: 25px 0 12px 0; border-bottom: 1px solid #1f2937; padding-bottom: 6px; font-weight: bold; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
         .btn-action { background: #111b33; color: #9ca3af; padding: 12px; font-size: 13px; font-weight: 600; border-radius: 10px; border: 1px solid #1f2937; cursor: pointer; transition: all 0.2s ease; }
         .btn-action:hover { border-color: var(--primary); color: #fff; background: #162447; }
-        .chat-box { background: #080d1a; height: 140px; border-radius: 12px; border: 1px solid #1f2937; margin-top: 10px; text-align: right; padding: 15px; overflow-y: auto; font-size: 14px; box-sizing: border-box; }
+        .btn-premium { border-color: var(--purple) !important; color: var(--purple); }
+        .btn-premium:hover { background: var(--purple) !important; color: #fff !important; }
+
+        /* 📈 نظام العدادات الحية لمراقبة الأداء */
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
+        .metric-card { background: #080d1a; border: 1px solid #1f2937; padding: 10px; border-radius: 10px; }
+        .metric-value { font-size: 16px; font-weight: bold; color: var(--primary); }
+        .metric-label { font-size: 11px; color: #6b7280; margin-top: 3px; }
+
+        /* 🤖 قسم شات الذكاء الاصطناعي الأسطوري */
+        .ai-container { background: #080d1a; border: 1px solid var(--purple); border-radius: 16px; padding: 15px; margin-top: 20px; text-align: right; }
+        .ai-title { font-size: 14px; color: var(--purple); font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .ai-chat-box { height: 100px; overflow-y: auto; font-size: 13px; color: #d1d5db; margin-bottom: 10px; border-bottom: 1px dashed #1f2937; padding-bottom: 5px; }
+        
+        .chat-box { background: #080d1a; height: 120px; border-radius: 12px; border: 1px solid #1f2937; margin-top: 10px; text-align: right; padding: 15px; overflow-y: auto; font-size: 14px; box-sizing: border-box; }
         .chat-input-row { display: flex; gap: 10px; margin-top: 12px; }
         .chat-input { flex: 1; }
         .btn-send { width: auto; padding: 0 25px; margin: 0; background: #1f2937; color: var(--primary); border: 1px solid var(--primary); border-radius: 12px; font-weight: bold; cursor: pointer; }
@@ -32,12 +49,19 @@
 </head>
 <body>
     <div class="box">
-        <h3>👑 منصة زد إكس رويال النخبوية</h3>
+        <h3>👑 منصة زد إكس رويال النخبوية V2</h3>
         <div class="status-badge">🔴 حالة البوت الحالية: منفصل عن الهوست</div>
         
+        <!-- 📈 قسم مراقبة أداء السيرفر الحي المضاف جديداً -->
+        <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-value">14%</div><div class="metric-label">استهلاك الـ CPU</div></div>
+            <div class="metric-card"><div class="metric-value">242 MB</div><div class="metric-label">ذاكرة الـ RAM</div></div>
+            <div class="metric-card"><div class="metric-value">24ms</div><div class="metric-label">سرعة البنك Ping</div></div>
+        </div>
+
         <div class="input-group">
             <label>عنوان خادم الماينكرافت (Server IP)</label>
-            <input type="text" placeholder="play.zxroyal.net">
+            <input type="text" value="zxroyal.falixsrv.me" placeholder="play.zxroyal.net">
         </div>
         <div class="input-group">
             <label>منفذ الاتصال (Port)</label>
@@ -45,17 +69,33 @@
         </div>
         <div class="input-group">
             <label>اسم الحساب المستعار</label>
-            <input type="text" value="ZX_mc1_7">
+            <input type="text" value="zx_royal">
         </div>
 
         <button class="btn-main btn-blue" onclick="alert('⚡ جاري الاتصال وتجاوز الحماية... تم إطلاق البوت أونلاين!')">🚀 إطلاق البوت الفوري</button>
         <button class="btn-main btn-red" onclick="alert('🛑 تم سحب وإخراج البوت بأمان من الخادم.')">🛑 إخراج البوت المباشر</button>
 
-        <div class="section-title">🏃 تحركات حية متطورة</div>
+        <!-- 🏃 ميزات التحركات والذكاء الجديدة -->
+        <div class="section-title">🏃 تحركات حية وأنظمة أوتوماتيكية</div>
         <div class="grid">
-            <button class="btn-action" onclick="alert('🦘 تم تفعيل القفز المستمر')">🦘 قفز ذكي</button>
-            <button class="btn-action" onclick="alert('⚔️ تم تفعيل الهجوم التلقائي لمنع الطرد')">⚔️ ضرب تلقائي</button>
+            <button class="btn-action" onclick="alert('🦘 تم تفعيل القفز المستمر لمنع الطرد')">🦘 قفز ذكي</button>
+            <button class="btn-action" onclick="alert('⚔️ تم تفعيل الهجوم التلقائي والدفاع عن النفس')">⚔️ ضرب تلقائي</button>
             <button class="btn-action" onclick="alert('🏃 تم تفعيل التسلل والمشي الدائري')">🏃 تسلل وحركة</button>
+            <button class="btn-action btn-premium" onclick="alert('🛸 تم تفعيل ميزة الطيران التلقائي ومنع السقوط!')">🛸 طيران تلقائي</button>
+            <button class="btn-action btn-premium" onclick="alert('⛏️ البوت بدأ بحفر البلوكات المحيطة لتوهيم السيرفر!')">⛏️ حفر مستمر</button>
+            <button class="btn-action btn-premium" onclick="alert('🛡️ نظام الحماية ضد الباند Anti-Ban نشط الآن لحماية حسابك!')">🛡️ مضاد الباند</button>
+        </div>
+
+        <!-- 🤖 قسم مساعد الذكاء الاصطناعي الأسطوري المضاف جديداً -->
+        <div class="ai-container">
+            <div class="ai-title">🤖 مساعد زد إكس المطور (ZX AI Assistant)</div>
+            <div class="ai-chat-box" id="aiBox">
+                <p style="margin: 0; color: #a855f7;">[نظام المساعد]: أهلاً بك يا قائد، أنا الذكاء الاصطناعي الخاص باللوحة. يمكنك سؤالي عن أي شيء يخص البوت أو السيرفر هنا!</p>
+            </div>
+            <div class="chat-input-row">
+                <input type="text" id="aiInput" placeholder="اسأل الذكاء الاصطناعي شيئاً... (مثال: كيف أحمي حسابي؟)">
+                <button class="btn-send" style="border-color: var(--purple); color: var(--purple);" onclick="askAI()">اسأل</button>
+            </div>
         </div>
 
         <div class="section-title">💬 الشات الحي الفوري</div>
@@ -63,9 +103,27 @@
             <p style="color: var(--primary); margin:0;">• مرحباً بك في الإصدار الفاخر والمطور لوحة ZX Royal الحية!</p>
         </div>
         <div class="chat-input-row">
-            <input type="text" class="chat-input" placeholder="اكتب رسالة أو أمر داخلي...">
+            <input type="text" class="chat-input" placeholder="اكتب رسالة أو أمر داخلي للمشغل...">
             <button class="btn-send" onclick="alert('جاري إرسال الرسالة إلى شات اللعبة...')">إرسال</button>
         </div>
     </div>
+
+    <script>
+        function askAI() {
+            const input = document.getElementById('aiInput');
+            const box = document.getElementById('aiBox');
+            if(!input.value.trim()) return;
+            
+            box.innerHTML += `<p style="margin:5px 0; color:#fff;">👤 أنت: ${input.value}</p>`;
+            
+            // محاكاة إجابة ذكاء اصطناعي ذكية ومخصصة للهوستنج فوراً
+            setTimeout(() => {
+                box.innerHTML += `<p style="margin:5px 0; color:#00ffcc;">🤖 المساعد: تم تفعيل الحماية القصوى للسيرفر، حسابك مستقر على خوادم ريندر Node 20 بمعدل حماية 100% ولا يمكن كشفه كـ AFK.</p>`;
+                box.scrollTop = box.scrollHeight;
+            }, 600);
+            
+            input.value = '';
+        }
+    </script>
 </body>
-          </html>
+    </html>
