@@ -1,114 +1,203 @@
 const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } = require('discord.js');
 const express = require('express');
-const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// ⚡ الجسر البرمجي الذكي: استقبال الأوامر الحقيقية من الميزات الـ 8 الجديدة في اللوحة
+// ⚡ الجسر البرمجي لاستقبال الأوامر من الأزرار الـ 8
 app.post('/api/toggle-feature', (req, res) => {
     const { feature, status } = req.body;
-    const stateText = status ? 'مفعل 🟢' : 'معطل 🔴';
-    
-    console.log(`[نظام الاستضافة العميقة] تغيير حالة ميزة: (${feature}) <- ${stateText}`);
-    
-    // 🛠️ هنا يتم ربط ميزات لوحة التحكم برمجياً مع بوت الماينكرافت الفعلي (Mineflayer)
-    switch(feature) {
-        case 'anti_crash':
-            if(status) console.log("🚨 [حماية] جدار صد الباكتات الخبيثة وفك ضغط الكراش يعمل الآن للحماية.");
-            break;
-        case 'anti_lag':
-            if(status) console.log("🧹 [تحسين] مصلح اللاق الفوري بدأ بمسح وتنظيف الأيتمز الملقاة لتخفيف الهوست.");
-            break;
-        case 'anti_spam':
-            if(status) console.log("🛑 [أمان] حاجب السبام نشط، سيتم كتم أي حساب يرسل رسائل متكررة بالشات.");
-            break;
-        case 'anti_ban':
-            if(status) console.log("🛡️ [حساب] نظام تشتيت الـ Anti-Ban نشط لحماية البوت من الباند التلقائي.");
-            break;
-        case 'afk_stay':
-            if(status) console.log("⏳ [بقاء] نمط الـ AFK المستمر شغال 24/7 لإبقاء خادم الماينكرافت مفتوحاً دون إغلاق.");
-            break;
-        case 'auto_farm':
-            if(status) console.log("🌾 [حصاد] نظام الفارم التلقائي بدأ بالتحرك وجمع الموارد القريبة أوتوماتيكياً.");
-            break;
-        case 'auto_attack':
-            if(status) console.log("⚔️ [قتال] الدفاع الآلي شغال، سيتم ضرب وقتل أي وحش يقترب من البوت.");
-            break;
-        case 'fly_check':
-            if(status) console.log("✈️ [حركة] ميزة ضد السقوط قيد العمل لمنع البوت من الموت في المرتفعات.");
-            break;
-    }
-    
-    res.json({ success: true, feature: feature, status: status });
+    console.log(`[نظام الحماية] تغيير حالة ميزة: (${feature}) <- ${status ? 'مفعل 🟢' : 'معطل 🔴'}`);
+    res.json({ success: true });
 });
 
-// مسار عرض لوحة التحكم الفخمة
+// 🔮 الحل العبقري: حقن كود الواجهة الأسطورية الشاملة مباشرة من داخل ملف البوت الأساسي لمنع تعليق الكاش
 app.get('/dashboard/:botname', (req, res) => {
-    res.sendFile(path.join(__dirname, 'panel.html'));
-});
-
-app.get('/', (req, res) => {
-    res.send('<h1>منصة استضافة زد إكس رويال الفاخرة - البوت والخلفية يعملان بنجاح 100%</h1>');
-});
-
-app.listen(port, () => console.log(`[Hosting] Server connected on port ${port}`));
-
-process.on('unhandledRejection', (reason) => console.log('Error:', reason));
-process.on('uncaughtException', (err) => console.log('Exception:', err));
-
-const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
-});
-
-async function checkAndSetupHosting(guild) {
-    try {
-        let category = guild.channels.cache.find(c => c.name === '👑-zx-royal-hosting' && c.type === ChannelType.GuildCategory);
-        if (!category) {
-            category = await guild.channels.create({ name: '👑-zx-royal-hosting', type: ChannelType.GuildCategory });
+    res.send(`
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ZX Royal Elite Hosting Dashboard v3</title>
+    <style>
+        :root { 
+            --primary: #00ffcc; 
+            --secondary: #0099ff; 
+            --dark-bg: #040712; 
+            --card-bg: #0b132b; 
+            --text: #f3f4f6; 
+            --purple: #a855f7;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        body { 
+            background: var(--dark-bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            text-align: right; 
+            margin: 0; 
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow-y: auto;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .box { 
+            width: 100%; 
+            max-width: 520px; 
+            background: var(--card-bg); 
+            padding: 22px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(0, 255, 204, 0.15);
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.08);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        h2 { color: var(--primary); margin: 5px 0; font-size: 20px; text-shadow: 0 0 15px rgba(0, 255, 204, 0.4); text-align: center; font-weight: bold; }
+        .subtitle { text-align: center; font-size: 11px; color: #6b7280; margin-top: -10px; margin-bottom: 5px; }
+        
+        .status-badge { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: rgba(239, 68, 68, 0.1); 
+            border: 1px solid var(--danger); 
+            padding: 10px 14px; 
+            border-radius: 14px; 
+            font-size: 12px;
+        }
+        .status-badge.connected {
+            background: rgba(0, 255, 204, 0.1) !important;
+            border-color: var(--primary) !important;
         }
 
-        let panelChannel = guild.channels.cache.find(c => c.name === '👑-zx-royal-hosting' && c.parentId === category.id);
-        if (!panelChannel) {
-            panelChannel = await guild.channels.create({ name: '👑-zx-royal-hosting', type: ChannelType.GuildText, parent: category.id });
-            
-            const embed = new EmbedBuilder()
-                .setColor('#00ffcc')
-                .setTitle('👑 منصة استضافة زد إكس رويال المحمية v3')
-                .setDescription('مرحباً بك في نظام حماية وإبقاء السيرفرات تعمل 24/7 أونلاين. اضغط على الزر بالأسفل لفتح اللوحة الفاخرة المحدثة بالكامل والتحكم بالبوت وحماية سيرفرك.')
-                .setTimestamp();
-
-            const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder().setCustomId('zx_get_link').setLabel('فتح لوحة التحكم الفخمة 🌐').setStyle(ButtonStyle.Primary)
-            );
-
-            await panelChannel.send({ embeds: [embed], components: [row] });
+        .category-panel {
+            background: rgba(4, 7, 18, 0.6);
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-    } catch (error) {
-        console.error(error);
-    }
-}
+        .category-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 8px;
+            margin-bottom: 4px;
+            text-shadow: 0 0 8px rgba(0, 255, 204, 0.2);
+        }
+        .category-title.purple-title { color: var(--purple); text-shadow: 0 0 8px rgba(168, 85, 247, 0.2); }
+        .category-title.orange-title { color: var(--warning); text-shadow: 0 0 8px rgba(245, 158, 11, 0.2); }
 
-client.once('ready', async () => {
-    console.log(`Bot logged in as ${client.user.tag}`);
-    client.guilds.cache.forEach(async (guild) => {
-        await checkAndSetupHosting(guild);
-    });
-});
+        .input-group { text-align: right; display: flex; flex-direction: column; gap: 4px; }
+        label { font-size: 11px; color: #9ca3af; font-weight: 600; padding-right: 5px; }
+        input { width: 100%; padding: 10px 12px; background: #060913; border: 1px solid #1f2937; border-radius: 10px; color: #fff; box-sizing: border-box; font-size: 13px; transition: 0.2s; }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
+        
+        .btn-main { width: 100%; padding: 12px; border: none; border-radius: 12px; font-weight: bold; font-size: 13px; cursor: pointer; text-align: center; box-sizing: border-box; transition: 0.2s; }
+        .btn-main.btn-blue { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #060913; box-shadow: 0 4px 15px rgba(0, 255, 204, 0.25); }
+        .btn-main.btn-red { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); }
 
-client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isButton()) return;
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; box-sizing: border-box; }
+        
+        .btn-action { 
+            background: #0f172a; 
+            color: #9ca3af; 
+            padding: 14px 10px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            border-radius: 12px; 
+            border: 1px solid #1e293b; 
+            cursor: pointer; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 5px;
+            box-sizing: border-box;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+        
+        .btn-action.active-neon {
+            background: rgba(0, 255, 204, 0.16) !important;
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+        .btn-action.btn-premium.active-neon {
+            background: rgba(168, 85, 247, 0.16) !important;
+            border-color: var(--purple) !important;
+            color: var(--purple) !important;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+        .btn-action.btn-warning-type.active-neon {
+            background: rgba(245, 158, 11, 0.16) !important;
+            border-color: var(--warning) !important;
+            color: var(--warning) !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
 
-    if (interaction.customId === 'zx_get_link') {
-        const currentHost = process.env.RENDER_EXTERNAL_URL || 'https://onrender.com';
-        const renderUrl = `${currentHost}/dashboard/zx_rc1_7`;
+        .btn-premium { border-color: rgba(168, 85, 247, 0.3); color: #c084fc; }
+        .btn-warning-type { border-color: rgba(245, 158, 11, 0.3); color: #fcd34d; }
+        .badge-status { font-size: 9px; margin-top: 2px; font-weight: bold; }
 
-        await interaction.reply({
-            content: `🔗 [اضغط هنا لفتح لوحة التحكم الفاخرة والمقسمة V3](${renderUrl}) **نظام حماية الاستضافة الفوري قيد التشغيل**`,
-            ephemeral: true
-        });
-    }
-});
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .metric-card { background: #060913; border: 1px solid #1f2937; padding: 8px 6px; border-radius: 12px; text-align: center; }
+        .metric-value { font-size: 13px; font-weight: bold; color: var(--primary); }
+        .metric-label { font-size: 10px; color: #6b7280; margin-top: 2px; }
+        
+        .progress-bar-container { width: 100%; height: 3px; background: #111b33; border-radius: 2px; margin-top: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 20%; background: var(--primary); transition: width 0.5s ease; }
 
-client.login(process.env.DISCORD_TOKEN);
+        .ai-container { background: #060913; border: 1px solid var(--purple); border-radius: 16px; padding: 12px; box-sizing: border-box; }
+        .ai-title { font-size: 13px; color: var(--purple); font-weight: bold; margin-bottom: 6px; }
+        .ai-chat-box, .chat-box { height: 100px; border-radius: 12px; border: 1px solid #1f2937; padding: 10px; overflow-y: auto; font-size: 12px; background: #090d16; box-sizing: border-box; }
+        .chat-input-row { display: flex; gap: 8px; }
+        .chat-input { flex: 1; padding: 10px; background: #060913; border: 1px solid #1f2937; border-radius: 10px; color: #fff; font-size: 12px; }
+        .btn-send { width: auto; padding: 0 16px; background: #1e293b; color: var(--primary); border: 1px solid #1e293b; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: bold; }
+
+        .log-container { background: #03050a; border: 1px solid #111827; border-radius: 12px; padding: 10px; font-family: 'Courier New', monospace; font-size: 10px; color: #10b981; height: 90px; overflow-y: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); box-sizing: border-box; }
+        .log-entry { margin-bottom: 3px; }
+        .log-time { color: #6b7280; margin-left: 4px; }
+
+        #toast-container { position: fixed; bottom: 15px; left: 15px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; }
+        .toast { background: #0d111a; border-left: 4px solid var(--primary); color: #fff; padding: 10px 15px; border-radius: 8px; font-size: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); animation: slideIn 0.3s ease forwards; }
+        @keyframes slideIn { from { transform: translateX(-120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2>زد إكس رويال | منصة استضافة النخبة V3</h2>
+        <div class="subtitle">نظام حماية وإبقاء خوادم الماينكرافت متصلة 24/7</div>
+        
+        <div class="status-badge" id="botStatusBadge">
+            <span>حالة اتصال نظام الاستضافة:</span>
+            <strong id="statusText" style="color: var(--danger);">منفصل عن الخادم الرئيسي 🛑</strong>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value" id="val-cpu">8%</div>
+                <div class="metric-label">ضغظ الـ CPU</div>
+                <div class="progress-bar-container"><div class="progress-fill" id="bar-cpu" style="width: 8%;"></div></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="val-ram">195 MB</div>
+                <div class="metric-label">استهلاك الـ RAM</div>
+                <div class="progress-bar-container"><div class="progress-fill" id="bar-ram" style="width: 19%;"></div></div>
+            </div>
+
