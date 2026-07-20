@@ -1,171 +1,207 @@
 const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, PermissionsBitField, ActivityType } = require('discord.js');
 const express = require('express');
+const mineflayer = require('mineflayer');
 
 const app = express();
 const port = process.env.PORT || 3000;
-
 app.use(express.json());
 
-// ⚡ الجسر البرمجي لاستقبال الأوامر من اللوحة
-app.post('/api/toggle-feature', (req, res) => {
-    const { feature, status } = req.body;
-    console.log(`[نظام الحماية] تغيير حالة ميزة: (${feature}) <- ${status ? 'مفعل 🟢' : 'معطل 🔴'}`);
-    res.json({ success: true });
+// 🤖 متغيرات حالة بوت الماينكرافت والميزات
+let bot = null;
+let features = { autoEat: true, autoMove: false, antiAfk: true };
+let botStatus = { connected: false, health: 20, food: 20 };
+
+// 🎮 دالة تشغيل بوت الماينكرافت عند الطلب من اللوحة
+function startMcBot(ip, port, username) {
+    if (bot) { try { bot.quit(); } catch(e){} }
+    
+    bot = mineflayer.createBot({
+        host: ip,
+        port: parseInt(port) || 25565,
+        username: username || 'ZX_AFK_Bot'
+    });
+
+    bot.on('spawn', () => {
+        botStatus.connected = true;
+        console.log(`[Mineflayer] دخل البوت إلى السيرفر: ${ip}`);
+    });
+
+    bot.on('health', () => {
+        botStatus.health = Math.round(bot.health);
+        botStatus.food = Math.round(bot.food);
+    });
+
+    bot.on('end', () => {
+        botStatus.connected = false;
+        console.log('[Mineflayer] انفصل البوت عن السيرفر');
+    });
+
+    bot.on('error', (err) => console.log('[Mineflayer Error]:', err.message));
+}
+
+// ⚡ استقبال أوامر الأزرار من اللوحة
+app.post('/api/action', (req, res) => {
+    const { type, ip, port, username, feature, status } = req.body;
+
+    if (type === 'start') {
+        startMcBot(ip, port, username);
+        return res.json({ success: true, message: 'جاري الاتصال بالسيرفر...' });
+    }
+
+    if (type === 'stop') {
+        if (bot) { bot.quit(); bot = null; }
+        botStatus.connected = false;
+        return res.json({ success: true, message: 'تم إيقاف البوت' });
+    }
+
+    if (type === 'toggle') {
+        features[feature] = status;
+        if (bot && botStatus.connected) {
+            // التحكم بالحركة داخل اللعبة
+            if (feature === 'autoMove') {
+                bot.setControlState('forward', status);
+            }
+        }
+        return res.json({ success: true });
+    }
+
+    res.json({ success: false });
 });
 
-// 🔮 صفحة لوحة التحكم (Dashboard)
+// 📊 إرسال بيانات الحالة الحية للوحة
+app.get('/api/status', (req, res) => {
+    res.json({ botStatus, features });
+});
+
+// 🔮 واجهة لوحة التحكم الأسطورية ZX Royal
 app.get('/', (req, res) => {
     res.send(`
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>ZX Royal Elite Hosting Dashboard v3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZX Royal Hosting Dashboard</title>
     <style>
-        :root { --primary: #00ffcc; --dark-bg: #040712; --card-bg: #0b132b; --text: #f3f4f6; }
-        body { background: var(--dark-bg); color: var(--text); font-family: sans-serif; text-align: right; padding: 15px; display: flex; justify-content: center; }
-        .box { width: 100%; max-width: 520px; background: var(--card-bg); padding: 22px; border-radius: 24px; border: 1px solid rgba(0,255,204,0.15); box-shadow: 0 0 30px rgba(0,255,204,0.08); }
-        h2 { color: var(--primary); font-size: 20px; text-align: center; }
-        .status-badge { background: rgba(0,255,204,0.1); border: 1px solid var(--primary); padding: 10px; border-radius: 14px; font-size: 12px; display: flex; justify-content: space-between; }
+        :root { --p: #00ffcc; --bg: #040712; --card: #0b132b; --txt: #f3f4f6; --danger: #ef4444; }
+        body { background: var(--bg); color: var(--txt); font-family: system-ui, sans-serif; padding: 15px; display: flex; justify-content: center; }
+        .box { width: 100%; max-width: 480px; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid rgba(0,255,204,0.2); box-shadow: 0 0 25px rgba(0,255,204,0.1); }
+        h2 { color: var(--p); text-align: center; margin: 5px 0 15px; font-size: 22px; }
+        .badge { background: #060913; border: 1px solid #1f2937; padding: 10px; border-radius: 12px; font-size: 13px; text-align: center; margin-bottom: 15px; }
+        .group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+        label { font-size: 11px; color: #9ca3af; }
+        input { padding: 10px; background: #060913; border: 1px solid #1f2937; border-radius: 8px; color: #fff; font-size: 13px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.2s; }
+        .btn-green { background: var(--p); color: #000; }
+        .btn-red { background: var(--danger); color: #fff; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .toggle-btn { background: #060913; border: 1px solid #1f2937; padding: 12px; border-radius: 10px; color: #fff; font-size: 12px; cursor: pointer; text-align: center; }
+        .toggle-btn.active { border-color: var(--p); color: var(--p); background: rgba(0,255,204,0.1); }
     </style>
 </head>
 <body>
     <div class="box">
-        <h2>زد إكس رويال | منصة استضافة النخبة V3</h2>
-        <div class="status-badge">
-            <span>حالة اتصال نظام الاستضافة:</span>
-            <strong style="color: var(--primary);">متصل بالخادم الرئيسي 🟢</strong>
+        <h2>👑 زد إكس رويال | ZX Royal</h2>
+        <div class="badge" id="st">حالة البوت: <b style="color:var(--danger)">منفصل 🔴</b></div>
+        
+        <div class="group"><label>IP السيرفر:</label><input type="text" id="ip" placeholder="play.server.com"></div>
+        <div class="group"><label>Port المنفذ:</label><input type="number" id="port" value="25565"></div>
+        <div class="group"><label>اسم البوت:</label><input type="text" id="user" placeholder="ZX_AFK_Bot"></div>
+        
+        <button class="btn btn-green" onclick="control('start')">🚀 دخول السيرفر</button>
+        <button class="btn btn-red" onclick="control('stop')">🛑 إخراج البوت</button>
+
+        <div class="grid">
+            <button class="toggle-btn" id="m-autoMove" onclick="toggle('autoMove')">🚶 تحريك أوتوماتيكي</button>
+            <button class="toggle-btn active" id="m-autoEat" onclick="toggle('autoEat')">🍖 أكل تلقائي</button>
         </div>
-        <p style="text-align: center; font-size: 14px; margin-top: 20px; color: #a855f7;">✨ نظام الحماية والإدارات متصل ويعمل 24/7</p>
     </div>
+
+    <script>
+        async function control(act) {
+            const ip = document.getElementById('ip').value;
+            const port = document.getElementById('port').value;
+            const username = document.getElementById('user').value;
+            await fetch('/api/action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ type: act, ip, port, username })
+            });
+        }
+
+        async function toggle(feat) {
+            const el = document.getElementById('m-' + feat);
+            const status = !el.classList.contains('active');
+            el.classList.toggle('active', status);
+            await fetch('/api/action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ type: 'toggle', feature: feat, status })
+            });
+        }
+
+        setInterval(async () => {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                document.getElementById('st').innerHTML = data.botStatus.connected 
+                    ? 'حالة البوت: <b style="color:var(--p)">متصل بالماب 🟢 (❤️ ' + data.botStatus.health + ')</b>'
+                    : 'حالة البوت: <b style="color:var(--danger)">منفصل 🔴</b>';
+            } catch(e){}
+        }, 3000);
+    </script>
 </body>
 </html>
     `);
 });
 
-app.listen(port, () => {
-    console.log(`[السيرفر] يعمل بنجاح على المنفذ: ${port}`);
-});
+app.listen(port, () => console.log(`[Express] Port: ${port}`));
 
-// 🤖 تشغيل بوت الديسكورد
-const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-    ]
-});
-
-// اسم الكاتيجوري واسم القناة المخصصة
+// 🤖 تشغيل بوت الديسكورد للتجهيز التلقائي
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
 const CATEGORY_NAME = '⚙️ | ZX ROYAL HOSTING';
 const CHANNEL_NAME = '🌐-لوحة-التحكم';
 
-// دالة الإنشاء والتأكد التلقائي من القنوات
-async function setupHostingCategoryAndChannel(guild) {
+async function setupChannels(guild) {
     try {
-        // 1. البحث عن الكاتيجوري أو إنشائه
-        let category = guild.channels.cache.find(c => c.name === CATEGORY_NAME && c.type === ChannelType.GuildCategory);
-        if (!category) {
-            category = await guild.channels.create({
-                name: CATEGORY_NAME,
-                type: ChannelType.GuildCategory,
-            });
-            console.log(`[تلقائي] تم إنشاء القسم: ${CATEGORY_NAME}`);
-        }
+        let cat = guild.channels.cache.find(c => c.name === CATEGORY_NAME && c.type === ChannelType.GuildCategory);
+        if (!cat) cat = await guild.channels.create({ name: CATEGORY_NAME, type: ChannelType.GuildCategory });
 
-        // 2. البحث عن القناة المخصصة أو إنشاؤها داخل الكاتيجوري
-        let channel = guild.channels.cache.find(c => c.name === CHANNEL_NAME && c.parentId === category.id);
-        if (!channel) {
-            channel = await guild.channels.create({
+        let ch = guild.channels.cache.find(c => c.name === CHANNEL_NAME && c.parentId === cat.id);
+        if (!ch) {
+            ch = await guild.channels.create({
                 name: CHANNEL_NAME,
-                type: ChannelType.GuildType ? ChannelType.GuildText : 0,
-                parent: category.id,
+                type: 0,
+                parent: cat.id,
                 permissionOverwrites: [
-                    {
-                        id: guild.id, // @everyone
-                        deny: [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.AddReactions], // منع الرسائل والتفاعلات
-                        allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory], // رؤية القناة وقراءة التاريخ
-                    },
-                    {
-                        id: client.user.id, // البوت نفسه
-                        allow: [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.EmbedLinks, PermissionsBitField.Flags.ManageMessages],
-                    }
-                ],
+                    { id: guild.id, deny: [PermissionsBitField.Flags.SendMessages], allow: [PermissionsBitField.Flags.ViewChannel] }
+                ]
             });
-
-            // إرسال رسالة اللوحة الأساسية مع الزر
             const embed = new EmbedBuilder()
                 .setTitle('👑 منصة زد إكس رويال | ZX Royal Hosting V3')
-                .setDescription('مرحباً بك في نظام استضافة خوادم الماينكرافت الذكي 24/7!\n\n🔒 **هذه القناة مخصصة ومحمية بالكامل.**\nاضغط على الزر أدناه للوصول المباشر والآمن إلى لوحة التحكم الخاصة بك.')
-                .setColor('#00ffcc')
-                .setThumbnail(guild.iconURL({ dynamic: true }) || null)
-                .setFooter({ text: 'ZX Royal Elite Protection System • 24/7 Active' });
+                .setDescription('اضغط الزر بالأسفل للحصول على لوحة التحكم المباشرة للتحكم ببوتك داخل ماينكرافت!')
+                .setColor('#00ffcc');
 
-            const row = new ActionRowBuilder()
-                .addComponents(
-                    new ButtonBuilder()
-                        .setCustomId('get_dashboard')
-                        .setLabel('دخول لوحة التحكم 🚀')
-                        .setStyle(ButtonStyle.Success)
-                );
+            const row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId('get_dash').setLabel('دخول لوحة التحكم 🚀').setStyle(ButtonStyle.Success)
+            );
 
-            await channel.send({ embeds: [embed], components: [row] });
-            console.log(`[تلقائي] تم إنشاء القناة المخصصة بنجاح: ${CHANNEL_NAME}`);
+            await ch.send({ embeds: [embed], components: [row] });
         }
-    } catch (err) {
-        console.error('[خطأ التجهيز التلقائي]:', err.message);
-    }
+    } catch (e) {}
 }
 
 client.once('ready', () => {
-    console.log(`[الديسكورد] تم تسجيل الدخول بنجاح باسم: ${client.user.tag}`);
-    
-    // وضع حالة البوت (Status)
-    client.user.setActivity('24/7 Hosting Dashboard 👑', { type: ActivityType.Watching });
-
-    // فحص جميع السيرفرات والتأكد من وجود الكاتيجوري والقناة تلقائياً
-    client.guilds.cache.forEach(guild => {
-        setupHostingCategoryAndChannel(guild);
-    });
+    client.user.setActivity('24/7 ZX Royal Hosting 👑', { type: ActivityType.Watching });
+    client.guilds.cache.forEach(g => setupChannels(g));
 });
 
-// عند إضافة البوت لسيرفر جديد يتم إنشاء القناة تلقائياً
-client.on('guildCreate', (guild) => {
-    setupHostingCategoryAndChannel(guild);
-});
-
-// 🛡️ حماية القناة: مسح أي رسالة يحاول شخص كتابتها بالخطأ لإبقاء القناة نظيفة ومخصصة للوحة فقط
-client.on('messageCreate', async (message) => {
-    if (message.author.bot) return;
-    if (message.channel.name === CHANNEL_NAME) {
-        try {
-            await message.delete(); // مسح الرسالة التخريبية تلقائياً
-        } catch (e) {
-            console.error('تعذر مسح الرسالة:', e.message);
-        }
+client.on('interactionCreate', async (i) => {
+    if (i.isButton() && i.customId === 'get_dash') {
+        const url = process.env.RENDER_EXTERNAL_URL || 'https://mc-afk-host.onrender.com';
+        await i.reply({ content: `🔗 رابط لوحة تحكم زد إكس رويال الخاص بك:\n${url}`, ephemeral: true });
     }
 });
 
-// 🖱️ التفاعل عند الضغط على زر اللوحة
-client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isButton()) return;
-
-    if (interaction.customId === 'get_dashboard') {
-        const renderUrl = process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000';
-        
-        await interaction.reply({
-            content: `✨ **أهلاً بك يا بطل!**\n\nإليك رابط لوحة التحكم الخاصة بك للتحكم بالاستضافة وحمايتها:\n🔗 **${renderUrl}**\n\n*(ملاحظة: هذا الرابط آمن ومخفي ولا يراه أحد غيرك)*`,
-            ephemeral: true // رسالة مخفية وخصيصة للمستخدم فقط
-        });
-    }
-});
-
-// تسجيل الدخول
-const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-if (DISCORD_TOKEN) {
-    client.login(DISCORD_TOKEN);
-} else {
-    console.log('[تنبيه] يرجى إدخال DISCORD_TOKEN في إعدادات Render.');
-}
+if (process.env.DISCORD_TOKEN) client.login(process.env.DISCORD_TOKEN);
 
