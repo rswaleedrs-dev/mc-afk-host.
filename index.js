@@ -1,19 +1,21 @@
-const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const express = require('express');
+const mineflayer = require('mineflayer');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// ⚡ الجسر البرمجي لاستقبال الأوامر من الأزرار الـ 8
+// ⚡ الجسر البرمجي لاستقبال الأوامر من اللوحة
 app.post('/api/toggle-feature', (req, res) => {
     const { feature, status } = req.body;
     console.log(`[نظام الحماية] تغيير حالة ميزة: (${feature}) <- ${status ? 'مفعل 🟢' : 'معطل 🔴'}`);
     res.json({ success: true });
 });
 
-// 🔮 الحل العبقري: حقن كود الواجهة الأسطورية الشاملة مباشرة من داخل ملف البوت الأساسي لمنع تعليق الكاش
-app.get('/dashboard/:botname', (req, res) => {
+// 🔮 صفحة لوحة التحكم (Dashboard)
+app.get('/', (req, res) => {
     res.send(`
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -43,8 +45,6 @@ app.get('/dashboard/:botname', (req, res) => {
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            overflow-y: auto;
-            -webkit-tap-highlight-color: transparent;
         }
         .box { 
             width: 100%; 
@@ -66,138 +66,72 @@ app.get('/dashboard/:botname', (req, res) => {
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: rgba(239, 68, 68, 0.1); 
-            border: 1px solid var(--danger); 
+            background: rgba(0, 255, 204, 0.1); 
+            border: 1px solid var(--primary); 
             padding: 10px 14px; 
             border-radius: 14px; 
             font-size: 12px;
         }
-        .status-badge.connected {
-            background: rgba(0, 255, 204, 0.1) !important;
-            border-color: var(--primary) !important;
-        }
-
-        .category-panel {
-            background: rgba(4, 7, 18, 0.6);
-            border: 1px solid #1e293b;
-            border-radius: 16px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .category-title {
-            font-size: 13px;
-            font-weight: bold;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border-bottom: 1px solid #1e293b;
-            padding-bottom: 8px;
-            margin-bottom: 4px;
-            text-shadow: 0 0 8px rgba(0, 255, 204, 0.2);
-        }
-        .category-title.purple-title { color: var(--purple); text-shadow: 0 0 8px rgba(168, 85, 247, 0.2); }
-        .category-title.orange-title { color: var(--warning); text-shadow: 0 0 8px rgba(245, 158, 11, 0.2); }
-
-        .input-group { text-align: right; display: flex; flex-direction: column; gap: 4px; }
-        label { font-size: 11px; color: #9ca3af; font-weight: 600; padding-right: 5px; }
-        input { width: 100%; padding: 10px 12px; background: #060913; border: 1px solid #1f2937; border-radius: 10px; color: #fff; box-sizing: border-box; font-size: 13px; transition: 0.2s; }
-        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
-        
-        .btn-main { width: 100%; padding: 12px; border: none; border-radius: 12px; font-weight: bold; font-size: 13px; cursor: pointer; text-align: center; box-sizing: border-box; transition: 0.2s; }
-        .btn-main.btn-blue { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #060913; box-shadow: 0 4px 15px rgba(0, 255, 204, 0.25); }
-        .btn-main.btn-red { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); }
-
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; box-sizing: border-box; }
-        
-        .btn-action { 
-            background: #0f172a; 
-            color: #9ca3af; 
-            padding: 14px 10px; 
-            font-size: 12px; 
-            font-weight: 600; 
-            border-radius: 12px; 
-            border: 1px solid #1e293b; 
-            cursor: pointer; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 5px;
-            box-sizing: border-box;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            user-select: none;
-        }
-        
-        .btn-action.active-neon {
-            background: rgba(0, 255, 204, 0.16) !important;
-            border-color: var(--primary) !important;
-            color: var(--primary) !important;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
-        }
-        .btn-action.btn-premium.active-neon {
-            background: rgba(168, 85, 247, 0.16) !important;
-            border-color: var(--purple) !important;
-            color: var(--purple) !important;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
-        }
-        .btn-action.btn-warning-type.active-neon {
-            background: rgba(245, 158, 11, 0.16) !important;
-            border-color: var(--warning) !important;
-            color: var(--warning) !important;
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
-        }
-
-        .btn-premium { border-color: rgba(168, 85, 247, 0.3); color: #c084fc; }
-        .btn-warning-type { border-color: rgba(245, 158, 11, 0.3); color: #fcd34d; }
-        .badge-status { font-size: 9px; margin-top: 2px; font-weight: bold; }
 
         .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .metric-card { background: #060913; border: 1px solid #1f2937; padding: 8px 6px; border-radius: 12px; text-align: center; }
         .metric-value { font-size: 13px; font-weight: bold; color: var(--primary); }
         .metric-label { font-size: 10px; color: #6b7280; margin-top: 2px; }
-        
-        .progress-bar-container { width: 100%; height: 3px; background: #111b33; border-radius: 2px; margin-top: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 20%; background: var(--primary); transition: width 0.5s ease; }
-
-        .ai-container { background: #060913; border: 1px solid var(--purple); border-radius: 16px; padding: 12px; box-sizing: border-box; }
-        .ai-title { font-size: 13px; color: var(--purple); font-weight: bold; margin-bottom: 6px; }
-        .ai-chat-box, .chat-box { height: 100px; border-radius: 12px; border: 1px solid #1f2937; padding: 10px; overflow-y: auto; font-size: 12px; background: #090d16; box-sizing: border-box; }
-        .chat-input-row { display: flex; gap: 8px; }
-        .chat-input { flex: 1; padding: 10px; background: #060913; border: 1px solid #1f2937; border-radius: 10px; color: #fff; font-size: 12px; }
-        .btn-send { width: auto; padding: 0 16px; background: #1e293b; color: var(--primary); border: 1px solid #1e293b; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: bold; }
-
-        .log-container { background: #03050a; border: 1px solid #111827; border-radius: 12px; padding: 10px; font-family: 'Courier New', monospace; font-size: 10px; color: #10b981; height: 90px; overflow-y: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); box-sizing: border-box; }
-        .log-entry { margin-bottom: 3px; }
-        .log-time { color: #6b7280; margin-left: 4px; }
-
-        #toast-container { position: fixed; bottom: 15px; left: 15px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; }
-        .toast { background: #0d111a; border-left: 4px solid var(--primary); color: #fff; padding: 10px 15px; border-radius: 8px; font-size: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); animation: slideIn 0.3s ease forwards; }
-        @keyframes slideIn { from { transform: translateX(-120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
-
     <div class="box">
         <h2>زد إكس رويال | منصة استضافة النخبة V3</h2>
         <div class="subtitle">نظام حماية وإبقاء خوادم الماينكرافت متصلة 24/7</div>
         
-        <div class="status-badge" id="botStatusBadge">
+        <div class="status-badge">
             <span>حالة اتصال نظام الاستضافة:</span>
-            <strong id="statusText" style="color: var(--danger);">منفصل عن الخادم الرئيسي 🛑</strong>
+            <strong style="color: var(--primary);">متصل بالخادم الرئيسي 🟢</strong>
         </div>
 
         <div class="metrics-grid">
             <div class="metric-card">
-                <div class="metric-value" id="val-cpu">8%</div>
+                <div class="metric-value">5%</div>
                 <div class="metric-label">ضغظ الـ CPU</div>
-                <div class="progress-bar-container"><div class="progress-fill" id="bar-cpu" style="width: 8%;"></div></div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="val-ram">195 MB</div>
+                <div class="metric-value">140 MB</div>
                 <div class="metric-label">استهلاك الـ RAM</div>
-                <div class="progress-bar-container"><div class="progress-fill" id="bar-ram" style="width: 19%;"></div></div>
             </div>
+            <div class="metric-card">
+                <div class="metric-value">12ms</div>
+                <div class="metric-label">استجابة الـ Ping</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+    `);
+});
+
+// تشغيل الخادم
+app.listen(port, () => {
+    console.log(`[السيرفر] يعمل بنجاح على المنفذ: ${port}`);
+});
+
+// 🤖 تشغيل بوت الديسكورد
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+    ]
+});
+
+client.once('ready', () => {
+    console.log(`[الديسكورد] تم تسجيل الدخول بنجاح باسم: ${client.user.tag}`);
+});
+
+// ربط توكين الديسكورد
+const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+if (DISCORD_TOKEN) {
+    client.login(DISCORD_TOKEN);
+} else {
+    console.log('[تنبيه] يرجى إدخال DISCORD_TOKEN في إعدادات البيئة (Environment Variables) على Render.');
+}
 
