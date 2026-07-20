@@ -1,6 +1,5 @@
-const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, PermissionsBitField, ActivityType } = require('discord.js');
 const express = require('express');
-const mineflayer = require('mineflayer');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,92 +23,27 @@ app.get('/', (req, res) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>ZX Royal Elite Hosting Dashboard v3</title>
     <style>
-        :root { 
-            --primary: #00ffcc; 
-            --secondary: #0099ff; 
-            --dark-bg: #040712; 
-            --card-bg: #0b132b; 
-            --text: #f3f4f6; 
-            --purple: #a855f7;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-        }
-        body { 
-            background: var(--dark-bg); 
-            color: var(--text); 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            text-align: right; 
-            margin: 0; 
-            padding: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-        .box { 
-            width: 100%; 
-            max-width: 520px; 
-            background: var(--card-bg); 
-            padding: 22px; 
-            border-radius: 24px; 
-            border: 1px solid rgba(0, 255, 204, 0.15);
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.08);
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        h2 { color: var(--primary); margin: 5px 0; font-size: 20px; text-shadow: 0 0 15px rgba(0, 255, 204, 0.4); text-align: center; font-weight: bold; }
-        .subtitle { text-align: center; font-size: 11px; color: #6b7280; margin-top: -10px; margin-bottom: 5px; }
-        
-        .status-badge { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: rgba(0, 255, 204, 0.1); 
-            border: 1px solid var(--primary); 
-            padding: 10px 14px; 
-            border-radius: 14px; 
-            font-size: 12px;
-        }
-
-        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .metric-card { background: #060913; border: 1px solid #1f2937; padding: 8px 6px; border-radius: 12px; text-align: center; }
-        .metric-value { font-size: 13px; font-weight: bold; color: var(--primary); }
-        .metric-label { font-size: 10px; color: #6b7280; margin-top: 2px; }
+        :root { --primary: #00ffcc; --dark-bg: #040712; --card-bg: #0b132b; --text: #f3f4f6; }
+        body { background: var(--dark-bg); color: var(--text); font-family: sans-serif; text-align: right; padding: 15px; display: flex; justify-content: center; }
+        .box { width: 100%; max-width: 520px; background: var(--card-bg); padding: 22px; border-radius: 24px; border: 1px solid rgba(0,255,204,0.15); box-shadow: 0 0 30px rgba(0,255,204,0.08); }
+        h2 { color: var(--primary); font-size: 20px; text-align: center; }
+        .status-badge { background: rgba(0,255,204,0.1); border: 1px solid var(--primary); padding: 10px; border-radius: 14px; font-size: 12px; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
     <div class="box">
         <h2>زد إكس رويال | منصة استضافة النخبة V3</h2>
-        <div class="subtitle">نظام حماية وإبقاء خوادم الماينكرافت متصلة 24/7</div>
-        
         <div class="status-badge">
             <span>حالة اتصال نظام الاستضافة:</span>
             <strong style="color: var(--primary);">متصل بالخادم الرئيسي 🟢</strong>
         </div>
-
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-value">5%</div>
-                <div class="metric-label">ضغظ الـ CPU</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">140 MB</div>
-                <div class="metric-label">استهلاك الـ RAM</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">12ms</div>
-                <div class="metric-label">استجابة الـ Ping</div>
-            </div>
-        </div>
+        <p style="text-align: center; font-size: 14px; margin-top: 20px; color: #a855f7;">✨ نظام الحماية والإدارات متصل ويعمل 24/7</p>
     </div>
 </body>
 </html>
     `);
 });
 
-// تشغيل الخادم
 app.listen(port, () => {
     console.log(`[السيرفر] يعمل بنجاح على المنفذ: ${port}`);
 });
@@ -123,15 +57,115 @@ const client = new Client({
     ]
 });
 
+// اسم الكاتيجوري واسم القناة المخصصة
+const CATEGORY_NAME = '⚙️ | ZX ROYAL HOSTING';
+const CHANNEL_NAME = '🌐-لوحة-التحكم';
+
+// دالة الإنشاء والتأكد التلقائي من القنوات
+async function setupHostingCategoryAndChannel(guild) {
+    try {
+        // 1. البحث عن الكاتيجوري أو إنشائه
+        let category = guild.channels.cache.find(c => c.name === CATEGORY_NAME && c.type === ChannelType.GuildCategory);
+        if (!category) {
+            category = await guild.channels.create({
+                name: CATEGORY_NAME,
+                type: ChannelType.GuildCategory,
+            });
+            console.log(`[تلقائي] تم إنشاء القسم: ${CATEGORY_NAME}`);
+        }
+
+        // 2. البحث عن القناة المخصصة أو إنشاؤها داخل الكاتيجوري
+        let channel = guild.channels.cache.find(c => c.name === CHANNEL_NAME && c.parentId === category.id);
+        if (!channel) {
+            channel = await guild.channels.create({
+                name: CHANNEL_NAME,
+                type: ChannelType.GuildType ? ChannelType.GuildText : 0,
+                parent: category.id,
+                permissionOverwrites: [
+                    {
+                        id: guild.id, // @everyone
+                        deny: [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.AddReactions], // منع الرسائل والتفاعلات
+                        allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory], // رؤية القناة وقراءة التاريخ
+                    },
+                    {
+                        id: client.user.id, // البوت نفسه
+                        allow: [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.EmbedLinks, PermissionsBitField.Flags.ManageMessages],
+                    }
+                ],
+            });
+
+            // إرسال رسالة اللوحة الأساسية مع الزر
+            const embed = new EmbedBuilder()
+                .setTitle('👑 منصة زد إكس رويال | ZX Royal Hosting V3')
+                .setDescription('مرحباً بك في نظام استضافة خوادم الماينكرافت الذكي 24/7!\n\n🔒 **هذه القناة مخصصة ومحمية بالكامل.**\nاضغط على الزر أدناه للوصول المباشر والآمن إلى لوحة التحكم الخاصة بك.')
+                .setColor('#00ffcc')
+                .setThumbnail(guild.iconURL({ dynamic: true }) || null)
+                .setFooter({ text: 'ZX Royal Elite Protection System • 24/7 Active' });
+
+            const row = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('get_dashboard')
+                        .setLabel('دخول لوحة التحكم 🚀')
+                        .setStyle(ButtonStyle.Success)
+                );
+
+            await channel.send({ embeds: [embed], components: [row] });
+            console.log(`[تلقائي] تم إنشاء القناة المخصصة بنجاح: ${CHANNEL_NAME}`);
+        }
+    } catch (err) {
+        console.error('[خطأ التجهيز التلقائي]:', err.message);
+    }
+}
+
 client.once('ready', () => {
     console.log(`[الديسكورد] تم تسجيل الدخول بنجاح باسم: ${client.user.tag}`);
+    
+    // وضع حالة البوت (Status)
+    client.user.setActivity('24/7 Hosting Dashboard 👑', { type: ActivityType.Watching });
+
+    // فحص جميع السيرفرات والتأكد من وجود الكاتيجوري والقناة تلقائياً
+    client.guilds.cache.forEach(guild => {
+        setupHostingCategoryAndChannel(guild);
+    });
 });
 
-// ربط توكين الديسكورد
+// عند إضافة البوت لسيرفر جديد يتم إنشاء القناة تلقائياً
+client.on('guildCreate', (guild) => {
+    setupHostingCategoryAndChannel(guild);
+});
+
+// 🛡️ حماية القناة: مسح أي رسالة يحاول شخص كتابتها بالخطأ لإبقاء القناة نظيفة ومخصصة للوحة فقط
+client.on('messageCreate', async (message) => {
+    if (message.author.bot) return;
+    if (message.channel.name === CHANNEL_NAME) {
+        try {
+            await message.delete(); // مسح الرسالة التخريبية تلقائياً
+        } catch (e) {
+            console.error('تعذر مسح الرسالة:', e.message);
+        }
+    }
+});
+
+// 🖱️ التفاعل عند الضغط على زر اللوحة
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isButton()) return;
+
+    if (interaction.customId === 'get_dashboard') {
+        const renderUrl = process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000';
+        
+        await interaction.reply({
+            content: `✨ **أهلاً بك يا بطل!**\n\nإليك رابط لوحة التحكم الخاصة بك للتحكم بالاستضافة وحمايتها:\n🔗 **${renderUrl}**\n\n*(ملاحظة: هذا الرابط آمن ومخفي ولا يراه أحد غيرك)*`,
+            ephemeral: true // رسالة مخفية وخصيصة للمستخدم فقط
+        });
+    }
+});
+
+// تسجيل الدخول
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 if (DISCORD_TOKEN) {
     client.login(DISCORD_TOKEN);
 } else {
-    console.log('[تنبيه] يرجى إدخال DISCORD_TOKEN في إعدادات البيئة (Environment Variables) على Render.');
+    console.log('[تنبيه] يرجى إدخال DISCORD_TOKEN في إعدادات Render.');
 }
 
