@@ -6,12 +6,26 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// 🌐 قراءة ملف الويب الخارجي بشكل نظيف وآمن
+// ميزة الربط: استقبال الأوامر التفاعلية من أزرار واجهة التحكم
+app.post('/api/toggle-feature', (req, res) => {
+    const { feature, status } = req.body;
+    console.log(`[تحكم عن بعد] تم تغيير حالة ميزة (${feature}) إلى: ${status ? 'مفعل 🟢' : 'معطل 🔴'}`);
+    
+    // هنا مستقبلاً تضع أكواد ماينكرافت الخاصة بالبوت (مثل bot.chat أو تشغيل الـ افك)
+    // مثال: if(feature === 'attack' && status) { startAttacking(); }
+    
+    res.json({ success: true, message: `وصل الأمر بنجاح للميزة ${feature}` });
+});
+
+// قراءة ملف الويب الخارجي بشكل نظيف وآمن
 app.get('/dashboard/:botname', (req, res) => {
     res.sendFile(path.join(__dirname, 'panel.html'));
 });
 
-app.get('/', (req, res) => res.send('<h1>منصة زد إكس رويال المطورة جاهزة!</h1>'));
+app.get('/', (req, res) => {
+    res.send('<h1>مساعد زد إكس رويال للوحة التحكم - السيرفر يعمل بنجاح أونلاين</h1>');
+});
+
 app.listen(port, () => console.log(`Server connected on port ${port}`));
 
 process.on('unhandledRejection', (reason) => console.log('Error:', reason));
@@ -31,15 +45,15 @@ async function checkAndSetupHosting(guild) {
         let panelChannel = guild.channels.cache.find(c => c.name === '👑-zx-royal-hosting' && c.parentId === category.id);
         if (!panelChannel) {
             panelChannel = await guild.channels.create({ name: '👑-zx-royal-hosting', type: ChannelType.GuildText, parent: category.id });
-
+            
             const embed = new EmbedBuilder()
                 .setColor('#ffaa00')
-                .setTitle('👑 منصة استضافة زد إكس رويال المحدثة | ZX Royal')
-                .setDescription('مرحباً بك! نساعدك في إدارة وحماية سيرفرك من الإغلاق عبر اللوحة الخنفسارية المطورة.\n\n👇 اضغط على الزر بالأسفل لفتح اللوحة الفاخرة الخاصة بك!')
+                .setTitle('ZX Royal | منصة استضافة زد إكس رويال المحمية')
+                .setDescription('مرحباً بك! نساعدك في إدارة وحماية سيرفرك من الاختراق عبر اللوحة الخارجية المطورة.')
                 .setTimestamp();
 
             const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder().setCustomId('zx_get_link').setLabel('🔗 فتح لوحة الويب الفاخرة').setStyle(ButtonStyle.Primary)
+                new ButtonBuilder().setCustomId('zx_get_link').setLabel('فتح لوحة التحكم 🌐').setStyle(ButtonStyle.Primary)
             );
 
             await panelChannel.send({ embeds: [embed], components: [row] });
@@ -51,23 +65,22 @@ async function checkAndSetupHosting(guild) {
 
 client.once('ready', async () => {
     console.log(`Bot logged in as ${client.user.tag}`);
-    client.guilds.cache.forEach(async (guild) => { await checkAndSetupHosting(guild); });
+    client.guilds.cache.forEach(async (guild) => {
+        await checkAndSetupHosting(guild);
+    });
 });
 
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
 
     if (interaction.customId === 'zx_get_link') {
-        // 🔮 السحر هنا: البوت يكتشف اسم النطاق ورابط السيرفر في ريندر تلقائياً أياً كان اسمه!
-        const hostHeader = interaction.guild.client.options.http?.api || ''; 
-        // سنستخدم متغير البيئة الافتراضي الذي توفره ريندر تلقائياً أو نعتمد على تحديد الرابط بشكل مرن
-        const currentHost = process.env.RENDER_EXTERNAL_URL || `https://onrender.com`;
-        
-        const renderUrl = `${currentHost}/dashboard/ZX_mc1_7`;
-        
-        await interaction.reply({ 
-            content: `🎯 **تفضل رابط لوحة التحكم الويب الخنفسارية والمطورة بالكامل:**\n🔗 [اضغط هنا لفتح لوحة التحكم الفاخرة](${renderUrl})`, 
-            ephemeral: true 
+        const hostHeader = interaction.guild.client.options.http?.api || '';
+        const currentHost = process.env.RENDER_EXTERNAL_URL || 'https://onrender.com';
+        const renderUrl = `${currentHost}/dashboard/zx_rc1_7`;
+
+        await interaction.reply({
+            content: `🔗 [اضغط هنا لفتح لوحة التحكم الفاخرة](${renderUrl}) **تفعل رابط لوحة التحكم المطور والخرافي بالكامل**`,
+            ephemeral: true
         });
     }
 });
