@@ -52,8 +52,8 @@
             font-size: 12px;
         }
         .status-badge.connected {
-            background: rgba(0, 255, 204, 0.1);
-            border-color: var(--primary);
+            background: rgba(0, 255, 204, 0.1) !important;
+            border-color: var(--primary) !important;
         }
 
         .input-group { text-align: right; display: flex; flex-direction: column; gap: 4px; }
@@ -81,8 +81,8 @@
         .btn-action { 
             background: #111b33; 
             color: #9ca3af; 
-            padding: 10px; 
-            font-size: 11px; 
+            padding: 12px; 
+            font-size: 12px; 
             font-weight: 600; 
             border-radius: 10px; 
             border: 1px solid #1f2937; 
@@ -90,21 +90,23 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            gap: 2px;
+            gap: 4px;
             box-sizing: border-box;
+            transition: all 0.2s ease;
         }
         
         .btn-action.active-neon {
             background: rgba(0, 255, 204, 0.15) !important;
             border-color: var(--primary) !important;
             color: var(--primary) !important;
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
+            transform: scale(0.98);
         }
         .btn-action.btn-premium.active-neon {
             background: rgba(168, 85, 247, 0.15) !important;
             border-color: var(--purple) !important;
             color: var(--purple) !important;
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
         }
 
         .btn-premium { border-color: rgba(168, 85, 247, 0.3); color: #c084fc; }
@@ -139,7 +141,7 @@
         
         <div class="status-badge" id="botStatusBadge">
             <span>حالة البوت الحالية:</span>
-            <strong id="statusText">منفصل عن الهوست 🛑</strong>
+            <strong id="statusText" style="color: var(--danger);">منفصل عن الهوست 🛑</strong>
         </div>
 
         <div class="metrics-grid">
@@ -193,5 +195,4 @@
             </button>
             <button class="btn-action btn-premium" onclick="toggleFeature(this, 'fly', 'الطيران المستمر', 'تم تفعيل الطيران التلقائي ومضاد السقوط من الارتفاعات')">
                 <span>طيران تلقائي</span><span class="badge-status" style="color:#ef4444;">[معطّل 🔴]</span>
-            </button>
 
