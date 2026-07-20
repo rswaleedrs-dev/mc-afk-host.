@@ -2,17 +2,18 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZX Royal Elite Ultra Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZX Royal Elite Hosting Dashboard v3</title>
     <style>
         :root { 
             --primary: #00ffcc; 
             --secondary: #0099ff; 
-            --dark-bg: #060913; 
-            --card-bg: #0e1527; 
+            --dark-bg: #050811; 
+            --card-bg: #0b1120; 
             --text: #f3f4f6; 
             --purple: #a855f7;
             --danger: #ef4444;
+            --warning: #f59e0b;
         }
         body { 
             background: var(--dark-bg); 
@@ -25,21 +26,23 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
         }
         .box { 
             width: 100%; 
-            max-width: 500px; 
+            max-width: 540px; 
             background: var(--card-bg); 
             padding: 20px; 
-            border-radius: 20px; 
+            border-radius: 24px; 
             border: 1px solid #1f2937;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.05);
+            box-shadow: 0 0 35px rgba(0, 255, 204, 0.05);
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
         }
-        h3 { color: var(--primary); margin: 5px 0; font-size: 18px; text-shadow: 0 0 15px rgba(0, 255, 204, 0.4); text-align: center; }
+        h2 { color: var(--primary); margin: 5px 0; font-size: 20px; text-shadow: 0 0 15px rgba(0, 255, 204, 0.4); text-align: center; font-weight: bold; }
+        .subtitle { text-align: center; font-size: 11px; color: #6b7280; margin-top: -10px; margin-bottom: 5px; }
         
         .status-badge { 
             display: flex; 
@@ -47,8 +50,8 @@
             align-items: center; 
             background: rgba(239, 68, 68, 0.1); 
             border: 1px solid var(--danger); 
-            padding: 8px 12px; 
-            border-radius: 12px; 
+            padding: 10px 14px; 
+            border-radius: 14px; 
             font-size: 12px;
         }
         .status-badge.connected {
@@ -56,36 +59,48 @@
             border-color: var(--primary) !important;
         }
 
+        .category-panel {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .category-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 6px;
+            margin-bottom: 2px;
+        }
+        .category-title.purple-title { color: var(--purple); }
+        .category-title.orange-title { color: var(--warning); }
+
         .input-group { text-align: right; display: flex; flex-direction: column; gap: 4px; }
         label { font-size: 11px; color: #9ca3af; font-weight: 600; padding-right: 5px; }
-        input { width: 100%; padding: 8px 12px; background: #080d1a; border: 1px solid #1f2937; border-radius: 10px; color: #fff; box-sizing: border-box; font-size: 13px; }
+        input { width: 100%; padding: 8px 12px; background: #060913; border: 1px solid #1f2937; border-radius: 10px; color: #fff; box-sizing: border-box; font-size: 13px; }
         input:focus { border-color: var(--primary); outline: none; }
         
-        .btn-main { width: 100%; padding: 10px; border: none; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; text-align: center; box-sizing: border-box; }
-        .btn-main.btn-blue { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #060913; box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); }
-        .btn-main.btn-red { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: var(--danger); }
+        .btn-main { width: 100%; padding: 11px; border: none; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; text-align: center; box-sizing: border-box; transition: 0.2s; }
+        .btn-main.btn-blue { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #060913; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2); }
+        .btn-main.btn-red { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); }
 
-        .section-title { 
-            font-size: 13px; 
-            color: var(--secondary); 
-            border-bottom: 1px solid #1f2937; 
-            padding-bottom: 4px; 
-            margin-top: 10px;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; box-sizing: border-box; }
         
         .btn-action { 
-            background: #111b33; 
+            background: #0f172a; 
             color: #9ca3af; 
-            padding: 12px; 
-            font-size: 12px; 
+            padding: 12px 10px; 
+            font-size: 11px; 
             font-weight: 600; 
-            border-radius: 10px; 
-            border: 1px solid #1f2937; 
+            border-radius: 12px; 
+            border: 1px solid #1e293b; 
             cursor: pointer; 
             display: flex; 
             flex-direction: column; 
@@ -93,39 +108,48 @@
             gap: 4px;
             box-sizing: border-box;
             transition: all 0.2s ease;
+            user-select: none;
         }
         
         .btn-action.active-neon {
-            background: rgba(0, 255, 204, 0.15) !important;
+            background: rgba(0, 255, 204, 0.14) !important;
             border-color: var(--primary) !important;
             color: var(--primary) !important;
-            box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
-            transform: scale(0.98);
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.3);
         }
         .btn-action.btn-premium.active-neon {
-            background: rgba(168, 85, 247, 0.15) !important;
+            background: rgba(168, 85, 247, 0.14) !important;
             border-color: var(--purple) !important;
             color: var(--purple) !important;
-            box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+        }
+        .btn-action.btn-warning-type.active-neon {
+            background: rgba(245, 158, 11, 0.14) !important;
+            border-color: var(--warning) !important;
+            color: var(--warning) !important;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
         }
 
-        .btn-premium { border-color: rgba(168, 85, 247, 0.3); color: #c084fc; }
+        .btn-premium { border-color: rgba(168, 85, 247, 0.25); color: #c084fc; }
+        .btn-warning-type { border-color: rgba(245, 158, 11, 0.25); color: #fcd34d; }
+        .badge-status { font-size: 9px; margin-top: 2px; font-weight: bold; }
 
         .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .metric-card { background: #080d1a; border: 1px solid #1f2937; padding: 6px; border-radius: 10px; text-align: center; }
+        .metric-card { background: #060913; border: 1px solid #1f2937; padding: 6px; border-radius: 10px; text-align: center; }
         .metric-value { font-size: 12px; font-weight: bold; color: var(--primary); }
         .metric-label { font-size: 9px; color: #6b7280; }
         
         .progress-bar-container { width: 100%; height: 3px; background: #111b33; border-radius: 2px; margin-top: 3px; overflow: hidden; }
         .progress-fill { height: 100%; width: 20%; background: var(--primary); transition: width 0.5s ease; }
 
-        .ai-container { background: #080d1a; border: 1px solid var(--purple); border-radius: 12px; padding: 10px; box-sizing: border-box; }
+        .ai-container { background: #060913; border: 1px solid var(--purple); border-radius: 14px; padding: 10px; box-sizing: border-box; }
         .ai-title { font-size: 12px; color: var(--purple); font-weight: bold; margin-bottom: 6px; }
-        .ai-chat-box, .chat-box { height: 90px; border-radius: 10px; border: 1px solid #1f2937; padding: 8px; overflow-y: auto; font-size: 11px; background: #0d111a; box-sizing: border-box; }
+        .ai-chat-box, .chat-box { height: 95px; border-radius: 10px; border: 1px solid #1f2937; padding: 8px; overflow-y: auto; font-size: 11px; background: #090d16; box-sizing: border-box; }
         .chat-input-row { display: flex; gap: 6px; }
-        .btn-send { width: auto; padding: 0 12px; background: #1f2937; color: var(--primary); border: 1px solid #1f2937; border-radius: 10px; cursor: pointer; font-size: 11px; }
+        .chat-input { flex: 1; padding: 8px; background: #060913; border: 1px solid #1f2937; border-radius: 10px; color: #fff; font-size: 11px; }
+        .btn-send { width: auto; padding: 0 14px; background: #1f2937; color: var(--primary); border: 1px solid #1f2937; border-radius: 10px; cursor: pointer; font-size: 11px; }
 
-        .log-container { background: #04070f; border: 1px solid #111827; border-radius: 10px; padding: 8px; font-family: 'Courier New', monospace; font-size: 9px; color: #10b981; height: 80px; overflow-y: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); box-sizing: border-box; }
+        .log-container { background: #03050a; border: 1px solid #111827; border-radius: 10px; padding: 8px; font-family: 'Courier New', monospace; font-size: 9px; color: #10b981; height: 85px; overflow-y: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); box-sizing: border-box; }
         .log-entry { margin-bottom: 2px; }
         .log-time { color: #6b7280; margin-left: 4px; }
 
@@ -137,62 +161,43 @@
 <body>
 
     <div class="box">
-        <h3>زد إكس رويال لوحة النخبة V2</h3>
+        <h2>زد إكس رويال | منصة استضافة النخبة V3</h2>
+        <div class="subtitle">نظام حماية وإبقاء خوادم الماينكرافت متصلة 24/7</div>
         
         <div class="status-badge" id="botStatusBadge">
-            <span>حالة البوت الحالية:</span>
-            <strong id="statusText" style="color: var(--danger);">منفصل عن الهوست 🛑</strong>
+            <span>حالة اتصال نظام الاستضافة:</span>
+            <strong id="statusText" style="color: var(--danger);">منفصل عن الخادم الرئيسي 🛑</strong>
         </div>
 
         <div class="metrics-grid">
             <div class="metric-card">
-                <div class="metric-value" id="val-cpu">14%</div>
-                <div class="metric-label">استهلاك الـ CPU</div>
-                <div class="progress-bar-container"><div class="progress-fill" id="bar-cpu" style="width: 14%;"></div></div>
+                <div class="metric-value" id="val-cpu">8%</div>
+                <div class="metric-label">ضغظ الـ CPU</div>
+                <div class="progress-bar-container"><div class="progress-fill" id="bar-cpu" style="width: 8%;"></div></div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="val-ram">242 MB</div>
-                <div class="metric-label">ذاكرة الـ RAM</div>
-                <div class="progress-bar-container"><div class="progress-fill" id="bar-ram" style="width: 24%;"></div></div>
+                <div class="metric-value" id="val-ram">195 MB</div>
+                <div class="metric-label">استهلاك الـ RAM</div>
+                <div class="progress-bar-container"><div class="progress-fill" id="bar-ram" style="width: 19%;"></div></div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="val-ping">24ms</div>
-                <div class="metric-label">سرعة البنك Ping</div>
-                <div class="progress-bar-container"><div class="progress-fill" id="bar-ping" style="width: 24%; background: var(--secondary);"></div></div>
+                <div class="metric-value" id="val-ping">15ms</div>
+                <div class="metric-label">استجابة الـ Ping</div>
+                <div class="progress-bar-container"><div class="progress-fill" id="bar-ping" style="width: 15%; background: var(--secondary);"></div></div>
             </div>
         </div>
 
-        <div class="input-group">
-            <label>عنوان خادم الماينكرافت (Server IP)</label>
-            <input type="text" id="srvIp" value="zxroyal.falixsrv.me">
-        </div>
-        <div class="input-group">
-            <label>منفذ الاتصال (Port)</label>
-            <input type="text" id="srvPort" value="25565">
-        </div>
-        <div class="input-group">
-            <label>اسم الحساب المستعار (Label)</label>
-            <input type="text" id="botName" value="zx_royal">
-        </div>
-
-        <button class="btn-main btn-blue" onclick="connectBot()">⚡ إطلاق البوت الفوري أونلاين</button>
-        <button class="btn-main btn-red" onclick="disconnectBot()">❌ إخراج البوت وسحب الواجهة</button>
-
-        <div class="section-title">
-            <span>تحركات حية وأنظمة أوتوماتيكية</span>
-            <span id="activeCounter" style="font-size: 10px; color: var(--primary); background: rgba(0,255,204,0.1); padding: 1px 6px; border-radius: 6px;">الميزات النشطة: 0 من 6</span>
-        </div>
-        
-        <div class="grid">
-            <button class="btn-action" onclick="toggleFeature(this, 'flee', 'الحظر الذكي', 'تم تشغيل ميزة الفلو لمنع الطرد')">
-                <span>حظر ذكي</span><span class="badge-status" style="color:#ef4444;">[معطّل 🔴]</span>
-            </button>
-            <button class="btn-action" onclick="toggleFeature(this, 'attack', 'الهجوم التلقائي', 'تم بدء الهجوم التلقائي والدفاع عن النفس')">
-                <span>هجوم تلقائي</span><span class="badge-status" style="color:#ef4444;">[معطّل 🔴]</span>
-            </button>
-            <button class="btn-action" onclick="toggleFeature(this, 'sneak', 'التسلل والالتفاف', 'تم تفعيل نمط التسلل والمشي الدائري الذكي')">
-                <span>تسلل وحركة 3</span><span class="badge-status" style="color:#ef4444;">[معطّل 🔴]</span>
-            </button>
-            <button class="btn-action btn-premium" onclick="toggleFeature(this, 'fly', 'الطيران المستمر', 'تم تفعيل الطيران التلقائي ومضاد السقوط من الارتفاعات')">
-                <span>طيران تلقائي</span><span class="badge-status" style="color:#ef4444;">[معطّل 🔴]</span>
+        <!-- الباب الأول: بيانات الاتصال الفوري بالسيرفر المضيف -->
+        <div class="category-panel">
+            <div class="category-title">📂 إعدادات الهوية وخادم الهدف</div>
+            <div class="input-group">
+                <label>عنوان خادم الماينكرافت (Server IP)</label>
+                <input type="text" id="srvIp" value="zxroyal.falixsrv.me">
+            </div>
+            <div class="grid">
+                <div class="input-group">
+                    <label>المنفذ (Port)</label>
+                    <input type="text" id="srvPort" value="25565">
+                </div>
+                <div class="input-group">
 
